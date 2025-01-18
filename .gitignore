@@ -174,4 +174,4 @@ cython_debug/
 .pypirc
 
 .idea
-resistere-config.toml
+resistere_config.toml

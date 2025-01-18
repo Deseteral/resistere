@@ -12,7 +12,7 @@ class ResistereConfig:
     inverter: InverterConfig
 
 def read_config() -> ResistereConfig:
-    with open("./resistere-config.toml", "rb") as f:
+    with open("./resistere_config.toml", "rb") as f:
         data = tomllib.load(f)
 
         config = ResistereConfig(
