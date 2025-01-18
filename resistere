@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+from src import resistere_config
+
+def main():
+    config = resistere_config.read_config()
+    print(config)
+
+if __name__ == "__main__":
+    main()
