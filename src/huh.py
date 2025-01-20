@@ -83,7 +83,7 @@ def read_power_registers(inverter: PySolarmanV5) -> list[int]:
         value = read_single_address(address, inverter)
         data.append(value)
 
-        print(f"register: 0x{address:04x}  value: {value}")
+        print(f"register: 0x{address:04x}  value: {value}  ({name})")
 
     return data
 
