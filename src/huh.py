@@ -74,6 +74,8 @@ def persist_values_to_file(config: ResistereConfig):
 
         w.writerow(values)
 
+    inverter.disconnect()
+
 
 def read_power_registers(inverter: PySolarmanV5) -> list[int]:
     data = []
