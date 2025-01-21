@@ -1,15 +1,24 @@
 import tomllib
 from dataclasses import dataclass
 
+
 @dataclass
 class InverterConfig:
     ip: str
     serial: int
     port: int
 
+
+@dataclass
+class ControllerConfig:
+    cycle_interval_seconds: int
+
+
 @dataclass
 class ResistereConfig:
     inverter: InverterConfig
+    controller: ControllerConfig
+
 
 def read_config() -> ResistereConfig:
     with open("./resistere_config.toml", "rb") as f:
@@ -17,6 +26,7 @@ def read_config() -> ResistereConfig:
 
         config = ResistereConfig(
             InverterConfig(data["inverter"]["ip"], data["inverter"]["serial"], data["inverter"]["port"]),
+            ControllerConfig(data["controller"]["cycle_interval_seconds"])
         )
 
         return config

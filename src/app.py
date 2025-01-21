@@ -1,9 +1,18 @@
+from time import sleep
+
 from src import pv
 from src.resistere_config import ResistereConfig
 
 
 def run(config: ResistereConfig):
-    _cycle(config)
+    print("Starting Resistere controller.")
+
+    print("Configuration:")
+    print(config)
+
+    while True:
+        _cycle(config)
+        sleep(config.controller.cycle_interval_seconds)
 
 
 def _cycle(config: ResistereConfig):
