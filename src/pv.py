@@ -4,7 +4,9 @@ from src.resistere_config import ResistereConfig
 
 
 def read_current_energy_surplus(config: ResistereConfig) -> float | None:
-    inverter = PySolarmanV5(config.inverter.ip, config.inverter.serial, port=config.inverter.port)
+    inverter = _connect_to_inverter(config)
+    if inverter is None:
+        return None
 
     pv_power = _read_single_address(0x05C4, inverter) * 0.1
     if pv_power is None:
@@ -27,4 +29,13 @@ def _read_single_address(address: int, inverter: PySolarmanV5) -> int | None:
         print(f"Error while reading value from register 0x{address:04x}.")
         print(err)
         inverter.disconnect()
+        return None
+
+def _connect_to_inverter(config: ResistereConfig) -> PySolarmanV5 | None:
+    try:
+        inverter = PySolarmanV5(config.inverter.ip, config.inverter.serial, port=config.inverter.port)
+        return inverter
+    except Exception as err:
+        print("Error while connecting to inverter.")
+        print(err)
         return None
