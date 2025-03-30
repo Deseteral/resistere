@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class InverterConfig:
+    enabled: bool
     ip: str
     serial: int
     port: int
@@ -25,7 +26,7 @@ def read_config() -> ResistereConfig:
         data = tomllib.load(f)
 
         config = ResistereConfig(
-            InverterConfig(data["inverter"]["ip"], data["inverter"]["serial"], data["inverter"]["port"]),
+            InverterConfig(data["inverter"]["enabled"], data["inverter"]["ip"], data["inverter"]["serial"], data["inverter"]["port"]),
             ControllerConfig(data["controller"]["cycle_interval_seconds"])
         )
 
