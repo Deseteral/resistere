@@ -1,5 +1,4 @@
 from src import resistere_config
-from src import app
 from src.app import App
 from src.fake_inverter import FakeInverter
 from src.solarman_inverter import SolarmanInverter
