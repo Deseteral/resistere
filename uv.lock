@@ -1,0 +1,47 @@
+version = 1
+revision = 1
+requires-python = ">=3.13"
+
+[[package]]
+name = "pyserial"
+version = "3.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/7d/ae3f0a63f41e4d2f6cb66a5b57197850f919f59e558159a4dd3a818f5082/pyserial-3.5.tar.gz", hash = "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb", size = 159125 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/bc/587a445451b253b285629263eb51c2d8e9bcea4fc97826266d186f96f558/pyserial-3.5-py2.py3-none-any.whl", hash = "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0", size = 90585 },
+]
+
+[[package]]
+name = "pysolarmanv5"
+version = "3.0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "umodbus" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/84/f6/8140c8e6c3fef744c40039c8ef255ee4ca73c84100abed876e252c4fd5a8/pysolarmanv5-3.0.6.tar.gz", hash = "sha256:ec3c6c03ec47bd0ee811f32ee4da272a28cc53141ab1113b5dbec55834c8afb5", size = 14628 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/b5/53474eb876dfe9af0750ad63cf240439d863404e301ae13a52b0afbb3eb4/pysolarmanv5-3.0.6-py3-none-any.whl", hash = "sha256:9e38e47914c5b8bf44166dd74056040ec041b1d7c44ff2ce94ec192eeae9fc5d", size = 15000 },
+]
+
+[[package]]
+name = "resistere"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "pysolarmanv5" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pysolarmanv5", specifier = ">=3.0.6" }]
+
+[[package]]
+name = "umodbus"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyserial" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c1/13/5eb635dd6ab67fedcfe5147209135a737d33c1220fdf4ad735a224a8a684/uModbus-1.0.4.tar.gz", hash = "sha256:26bbbeff02d6d8a3e29bb0f9d9044c672d55fc1687afe4297a2f7d68175103a7", size = 19423 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/b9/664b226d34cc5154dfd0f92ccfaa6cb03dd3d2f77951c0d67eedb74ace5b/uModbus-1.0.4-py2.py3-none-any.whl", hash = "sha256:aab3e61488d8bef638466687b360192ddf046a23b61a9ba3734b4f48d31efe16", size = 31500 },
+]
