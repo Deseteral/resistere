@@ -1,8 +1,7 @@
 [project]
-name = "resistere"
+name = "solarman-interface"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pysolarmanv5>=3.0.6",
