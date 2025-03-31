@@ -1,2 +1,4 @@
 .idea
+bin/
+internal/view/*.go
 resistere_config.toml
