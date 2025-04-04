@@ -11,6 +11,6 @@ run:
 
 templ:
 	@echo "Building templ components"
-	~/go/bin/templ generate
+	go tool templ generate
 	@echo ""
 
