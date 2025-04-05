@@ -7,11 +7,23 @@ import (
 )
 
 type Config struct {
-    Web Web
+    Web        Web
+    Controller Controller
+    Inverter   Inverter
 }
 
 type Web struct {
     Port int
+}
+
+type Controller struct {
+    CycleIntervalSeconds int
+}
+
+type Inverter struct {
+    Ip     string
+    Serial string
+    Port   string
 }
 
 func ReadConfig() (*Config, error) {
