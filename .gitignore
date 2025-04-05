@@ -1,4 +1,5 @@
 .idea
+.DS_Store
 bin/
 internal/view/*.go
 resistere_config.toml
