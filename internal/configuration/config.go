@@ -1,45 +1,45 @@
 package configuration
 
 import (
-    "github.com/BurntSushi/toml"
-    "log"
-    "os"
+	"github.com/BurntSushi/toml"
+	"log"
+	"os"
 )
 
 type Config struct {
-    Web        Web
-    Controller Controller
-    Inverter   Inverter
+	Web        Web
+	Controller Controller
+	Inverter   Inverter
 }
 
 type Web struct {
-    Port int
+	Port int
 }
 
 type Controller struct {
-    CycleIntervalSeconds int
+	CycleIntervalSeconds int
 }
 
 type Inverter struct {
-    Ip     string
-    Serial string
-    Port   string
+	Ip     string
+	Serial string
+	Port   string
 }
 
 func ReadConfig() (*Config, error) {
-    file, err := os.ReadFile("resistere_config.toml")
-    if err != nil {
-        return nil, err
-    }
+	file, err := os.ReadFile("resistere_config.toml")
+	if err != nil {
+		return nil, err
+	}
 
-    var tomlData = string(file)
+	var tomlData = string(file)
 
-    var conf Config
-    _, err = toml.Decode(tomlData, &conf)
-    if err != nil {
-        return nil, err
-    }
+	var conf Config
+	_, err = toml.Decode(tomlData, &conf)
+	if err != nil {
+		return nil, err
+	}
 
-    log.Println("Configuration successfully read.")
-    return &conf, err
+	log.Println("Configuration successfully read.")
+	return &conf, err
 }

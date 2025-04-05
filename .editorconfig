@@ -9,3 +9,6 @@ insert_final_newline = true
 
 [{*.go,*.templ}]
 indent_style = tab
+
+[*.css]
+indent_size = 2
