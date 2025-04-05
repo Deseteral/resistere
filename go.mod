@@ -1,6 +1,6 @@
 module github.com/deseteral/resistere
 
-go 1.23.2
+go 1.24
 
 require (
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
