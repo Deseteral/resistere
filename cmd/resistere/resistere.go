@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/deseteral/resistere/internal/configuration"
 	"log"
 	"net/http"
 
@@ -11,13 +12,31 @@ import (
 )
 
 func run() error {
-	fmt.Println("Starting a server")
+	config, err := configuration.ReadConfig()
+	if err != nil {
+		log.Println("Could not read config.")
+		return err
+	}
 
+	err = startWebServer(config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func startWebServer(config *configuration.Config) error {
 	http.Handle("/", templ.Handler(view.Index()))
-
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	http.ListenAndServe(":80", nil)
+	log.Printf("Starting web server on port %v.\n", config.Web.Port)
+
+	var addr = fmt.Sprintf(":%v", config.Web.Port)
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
