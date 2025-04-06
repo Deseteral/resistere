@@ -3,6 +3,7 @@ package inverter
 import (
 	"bytes"
 	"embed"
+	"github.com/deseteral/resistere/internal/configuration"
 	"log"
 	"os"
 	"os/exec"
@@ -13,7 +14,7 @@ import (
 //go:embed solarman_interface/build/solarman_interface.pyz
 var solarmanInterfaceBinary embed.FS
 
-func ReadSolarmanEnergySurplus() (energySurplus float64, error error) {
+func ReadSolarmanEnergySurplus(config *configuration.Inverter) (energySurplus float64, error error) {
 	// Extract Python binary to tmp location for running.
 	binaryFilePath, err := preparePythonBinary()
 	if err != nil {
@@ -28,7 +29,7 @@ func ReadSolarmanEnergySurplus() (energySurplus float64, error error) {
 	}(binaryFilePath)
 
 	// Process and return output from Python binary.
-	energySurplus, err = execPythonBinary(binaryFilePath)
+	energySurplus, err = execPythonBinary(binaryFilePath, config)
 	if err != nil {
 		return -1, err
 	}
@@ -73,8 +74,8 @@ func cleanupSolarmanInterface(binaryFilePath string) error {
 	return nil
 }
 
-func execPythonBinary(binaryFilePath string) (energySurplus float64, error error) {
-	cmd := exec.Command(binaryFilePath)
+func execPythonBinary(binaryFilePath string, config *configuration.Inverter) (energySurplus float64, error error) {
+	cmd := exec.Command(binaryFilePath, config.Ip, config.Serial, config.Port)
 
 	var buffer bytes.Buffer
 	cmd.Stdout = &buffer
