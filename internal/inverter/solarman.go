@@ -3,6 +3,7 @@ package inverter
 import (
 	"bytes"
 	"embed"
+	"github.com/deseteral/resistere/internal/configuration"
 	"log"
 	"os"
 	"os/exec"
@@ -100,4 +101,12 @@ func (i SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus
 	}
 
 	return energySurplus, nil
+}
+
+func NewSolarmanInverter(config *configuration.Inverter) SolarmanInverter {
+	return SolarmanInverter{
+		Ip:     config.Ip,
+		Serial: config.Serial,
+		Port:   config.Port,
+	}
 }
