@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/inverter"
 	"github.com/deseteral/resistere/internal/webapp"
 	"log"
 )
@@ -13,7 +14,11 @@ func startApplication() error {
 		return err
 	}
 
-	controller.StartController(&config.Controller)
+	c := controller.NewController(
+		inverter.NewSolarmanInverter(&config.Inverter),
+		&config.Controller,
+	)
+	c.StartController()
 
 	err = webapp.StartWebServerBlocking(config)
 	if err != nil {
