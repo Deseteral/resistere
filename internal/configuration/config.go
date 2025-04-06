@@ -33,7 +33,7 @@ func ReadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	var tomlData = string(file)
+	tomlData := string(file)
 
 	var conf Config
 	_, err = toml.Decode(tomlData, &conf)
