@@ -29,6 +29,7 @@ type Inverter struct {
 func ReadConfig() (*Config, error) {
 	file, err := os.ReadFile("resistere_config.toml")
 	if err != nil {
+		log.Printf("Could not read config file: %v", err)
 		return nil, err
 	}
 
@@ -37,6 +38,7 @@ func ReadConfig() (*Config, error) {
 	var conf Config
 	_, err = toml.Decode(tomlData, &conf)
 	if err != nil {
+		log.Printf("Could not parse config file: %v", err)
 		return nil, err
 	}
 
