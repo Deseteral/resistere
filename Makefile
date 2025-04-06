@@ -5,6 +5,11 @@ build:
 	go build -o ./bin/resistere ./cmd/resistere
 	@echo ""
 
+build_release:
+	@echo "Building release version of application"
+	go build -ldflags "-s -w" -o ./bin/resistere ./cmd/resistere
+	@echo ""
+
 run:
 	@echo "Running application"
 	./bin/resistere
