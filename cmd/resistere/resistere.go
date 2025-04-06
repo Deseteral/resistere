@@ -4,6 +4,7 @@ import (
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
 	"github.com/deseteral/resistere/internal/pv"
+	"github.com/deseteral/resistere/internal/vehicle"
 	"github.com/deseteral/resistere/internal/webapp"
 	"log"
 )
@@ -15,9 +16,11 @@ func startApplication() error {
 	}
 
 	inverter := pv.NewSolarmanInverter(&config.SolarmanInverter)
+	vehicleController := vehicle.NewTeslaControlController(&config.TeslaControl)
 
 	c := controller.NewController(
 		inverter,
+		vehicleController,
 		&config.Controller,
 	)
 	c.StartBackgroundTask()

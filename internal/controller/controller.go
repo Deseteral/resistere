@@ -3,13 +3,15 @@ package controller
 import (
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/pv"
+	"github.com/deseteral/resistere/internal/vehicle"
 	"log"
 	"time"
 )
 
 type Controller struct {
-	updateInterval time.Duration
-	inverter       pv.Inverter
+	updateInterval    time.Duration
+	inverter          pv.Inverter
+	vehicleController vehicle.Controller
 }
 
 func (c Controller) StartBackgroundTask() {
@@ -34,9 +36,14 @@ func (c Controller) tick() {
 	log.Println("Starting controller tick.")
 }
 
-func NewController(inverter pv.Inverter, config *configuration.Controller) Controller {
+func NewController(
+	inverter pv.Inverter,
+	vehicleController vehicle.Controller,
+	config *configuration.Controller,
+) Controller {
 	return Controller{
-		updateInterval: time.Duration(config.CycleIntervalSeconds) * time.Second,
-		inverter:       inverter,
+		updateInterval:    time.Duration(config.CycleIntervalSeconds) * time.Second,
+		inverter:          inverter,
+		vehicleController: vehicleController,
 	}
 }

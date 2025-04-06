@@ -10,6 +10,7 @@ type Config struct {
 	Web              Web
 	Controller       Controller
 	SolarmanInverter SolarmanInverter `toml:"solarman_inverter"`
+	TeslaControl     TeslaControl     `toml:"tesla_control"`
 }
 
 type Web struct {
@@ -24,6 +25,10 @@ type SolarmanInverter struct {
 	Ip     string
 	Serial string
 	Port   string
+}
+
+type TeslaControl struct {
+	KeyFile string `toml:"key_file"`
 }
 
 func ReadConfig() (*Config, error) {
