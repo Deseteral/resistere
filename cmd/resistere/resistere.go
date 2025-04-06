@@ -11,10 +11,9 @@ import (
 	"github.com/deseteral/resistere/internal/view"
 )
 
-func run() error {
+func startApplication() error {
 	config, err := configuration.ReadConfig()
 	if err != nil {
-		log.Println("Could not read config.")
 		return err
 	}
 
@@ -42,8 +41,9 @@ func startWebServer(config *configuration.Config) error {
 }
 
 func main() {
-	err := run()
+	err := startApplication()
 	if err != nil {
+		log.Println("Could not start application.")
 		log.Fatal(err)
 	}
 }
