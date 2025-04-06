@@ -14,7 +14,7 @@ def main():
     surplus = read_current_energy_surplus(args.ip, args.serial, args.port)
 
     if surplus is not None:
-        print(f"surplus {surplus}")
+        print(surplus)
         sys.exit(0)
     else:
         sys.exit(1)
