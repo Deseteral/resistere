@@ -21,7 +21,7 @@ templ:
 
 solarman_interface_binary:
 	@echo "Building solarman_interface Python binary"
-	mkdir -p ./internal/inverter/solarman_interface/build
-	python3 -m zipapp ./internal/inverter/solarman_interface/src -m "main:main" -o ./internal/inverter/solarman_interface/build/solarman_interface.pyz -p "/usr/bin/env python3"
-	chmod u+x ./internal/inverter/solarman_interface/build/solarman_interface.pyz
+	mkdir -p ./internal/pv/solarman_interface/build
+	python3 -m zipapp ./internal/pv/solarman_interface/src -m "main:main" -o ./internal/pv/solarman_interface/build/solarman_interface.pyz -p "/usr/bin/env python3"
+	chmod u+x ./internal/pv/solarman_interface/build/solarman_interface.pyz
 	@echo ""

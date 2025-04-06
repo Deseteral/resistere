@@ -1,4 +1,4 @@
-package inverter
+package pv
 
 import (
 	"bytes"

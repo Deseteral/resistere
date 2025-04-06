@@ -2,17 +2,17 @@ package controller
 
 import (
 	"github.com/deseteral/resistere/internal/configuration"
-	"github.com/deseteral/resistere/internal/inverter"
+	"github.com/deseteral/resistere/internal/pv"
 	"log"
 	"time"
 )
 
 type Controller struct {
 	updateInterval time.Duration
-	inverter       inverter.Inverter
+	inverter       pv.Inverter
 }
 
-func (c Controller) StartController() {
+func (c Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
 	// Run first tick before ticker starts.
@@ -34,7 +34,7 @@ func (c Controller) tick() {
 	log.Println("Starting controller tick.")
 }
 
-func NewController(inverter inverter.Inverter, config *configuration.Controller) Controller {
+func NewController(inverter pv.Inverter, config *configuration.Controller) Controller {
 	return Controller{
 		updateInterval: time.Duration(config.CycleIntervalSeconds) * time.Second,
 		inverter:       inverter,
