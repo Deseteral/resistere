@@ -15,7 +15,7 @@ func startApplication() error {
 	}
 
 	c := controller.NewController(
-		inverter.NewSolarmanInverter(&config.Inverter),
+		inverter.NewSolarmanInverter(&config.SolarmanInverter),
 		&config.Controller,
 	)
 	c.StartController()

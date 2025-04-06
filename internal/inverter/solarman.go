@@ -103,7 +103,7 @@ func (i SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus
 	return energySurplus, nil
 }
 
-func NewSolarmanInverter(config *configuration.Inverter) SolarmanInverter {
+func NewSolarmanInverter(config *configuration.SolarmanInverter) SolarmanInverter {
 	return SolarmanInverter{
 		Ip:     config.Ip,
 		Serial: config.Serial,

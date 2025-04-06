@@ -7,9 +7,9 @@ import (
 )
 
 type Config struct {
-	Web        Web
-	Controller Controller
-	Inverter   Inverter
+	Web              Web
+	Controller       Controller
+	SolarmanInverter SolarmanInverter `toml:"solarman_inverter"`
 }
 
 type Web struct {
@@ -20,7 +20,7 @@ type Controller struct {
 	CycleIntervalSeconds int `toml:"cycle_interval_seconds"`
 }
 
-type Inverter struct {
+type SolarmanInverter struct {
 	Ip     string
 	Serial string
 	Port   string
