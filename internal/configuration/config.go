@@ -17,7 +17,7 @@ type Web struct {
 }
 
 type Controller struct {
-	CycleIntervalSeconds int
+	CycleIntervalSeconds int `toml:"cycle_interval_seconds"`
 }
 
 type Inverter struct {

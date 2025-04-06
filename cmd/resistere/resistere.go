@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/deseteral/resistere/internal/configuration"
+	"github.com/deseteral/resistere/internal/controller"
 	"github.com/deseteral/resistere/internal/webapp"
 	"log"
 )
@@ -11,6 +12,8 @@ func startApplication() error {
 	if err != nil {
 		return err
 	}
+
+	controller.StartController(&config.Controller)
 
 	err = webapp.StartWebServerBlocking(config)
 	if err != nil {
