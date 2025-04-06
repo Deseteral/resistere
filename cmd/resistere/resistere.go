@@ -15,8 +15,17 @@ func startApplication() error {
 		return err
 	}
 
-	inverter := pv.NewSolarmanInverter(&config.SolarmanInverter)
-	vehicleController := vehicle.NewTeslaControlController(&config.TeslaControl)
+	var inverter pv.Inverter
+	var vehicleController vehicle.Controller
+
+	if config.SimulatorMode {
+		log.Println("Running in simulator mode.")
+		inverter = pv.NewSimulatedInverter()
+		vehicleController = vehicle.NewSimulatedVehicleController()
+	} else {
+		inverter = pv.NewSolarmanInverter(&config.SolarmanInverter)
+		vehicleController = vehicle.NewTeslaControlController(&config.TeslaControl)
+	}
 
 	c := controller.NewController(
 		inverter,

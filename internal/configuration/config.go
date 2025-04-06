@@ -11,6 +11,7 @@ type Config struct {
 	Controller       Controller
 	SolarmanInverter SolarmanInverter `toml:"solarman_inverter"`
 	TeslaControl     TeslaControl     `toml:"tesla_control"`
+	SimulatorMode    bool             `toml:"simulator_mode"`
 }
 
 type Web struct {
