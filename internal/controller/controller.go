@@ -34,6 +34,26 @@ func (c Controller) StartBackgroundTask() {
 
 func (c Controller) tick() {
 	log.Println("Starting controller tick.")
+
+	// Check which car is in range and is charging.
+	// Save which one is charging and what is its current set amps.
+	// If none, log and return.
+
+	// Get energy surplus (kW) from inverter, change it to watts (* 1000).
+	//
+	// Calculate by how much we should change the charging speed.
+	// Save whether surplus is positive (increase speed), or negative (decrease speed) (signum of surplus).
+	// Convert surplus to its absolute value, and floor it.
+	// Calculate amps:
+	//   V * A = W
+	//   A = W / V
+	//   ^   ^   ^--this is always 230V in Europe, but it should be configurable.
+	//   |   |__the energy surplus, in watts, floored.
+	//   |__the amount by which we can increase charging speed.
+
+	// We should call vehicle controller with
+	//   saved vehicle amps +/- calculated amp diff (whether we're increasing or decreasing speed,
+	//   min 5A ... max 16A.
 }
 
 func NewController(
