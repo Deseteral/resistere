@@ -10,7 +10,7 @@ type TeslaControlController struct {
 	keyFilePath string
 }
 
-func (c TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) error {
+func (c *TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) error {
 	cmd := exec.Command(
 		"tesla-control",
 		"-vin", vehicle.Vin,

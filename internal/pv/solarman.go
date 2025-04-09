@@ -20,7 +20,7 @@ type SolarmanInverter struct {
 	Port   string
 }
 
-func (i SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error error) {
+func (i *SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error error) {
 	// Extract Python binary to tmp location for running.
 	binaryFilePath, err := i.preparePythonBinary()
 	if err != nil {
@@ -43,7 +43,7 @@ func (i SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error erro
 	return energySurplus, nil
 }
 
-func (i SolarmanInverter) preparePythonBinary() (binaryPath string, error error) {
+func (i *SolarmanInverter) preparePythonBinary() (binaryPath string, error error) {
 	tmpFile, err := os.CreateTemp("", "solarman_interface_*.pyz")
 	if err != nil {
 		log.Printf("Failed to create temporary file for solarman_interface: %v", err)
@@ -71,7 +71,7 @@ func (i SolarmanInverter) preparePythonBinary() (binaryPath string, error error)
 	return tmpFile.Name(), nil
 }
 
-func (i SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error {
+func (i *SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error {
 	err := os.Remove(binaryFilePath)
 	if err != nil {
 		log.Printf("Failed to remove solarman_interface tmp file: %v", err)
@@ -80,7 +80,7 @@ func (i SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error 
 	return nil
 }
 
-func (i SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus float64, error error) {
+func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus float64, error error) {
 	cmd := exec.Command(binaryFilePath, i.Ip, i.Serial, i.Port)
 
 	var buffer bytes.Buffer
