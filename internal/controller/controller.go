@@ -14,7 +14,7 @@ type Controller struct {
 	vehicleController vehicle.Controller
 }
 
-func (c Controller) StartBackgroundTask() {
+func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
 	// Run first tick before ticker starts.
@@ -32,7 +32,7 @@ func (c Controller) StartBackgroundTask() {
 	}()
 }
 
-func (c Controller) tick() {
+func (c *Controller) tick() {
 	log.Println("Starting controller tick.")
 
 	// Check which car is in range and is charging.
