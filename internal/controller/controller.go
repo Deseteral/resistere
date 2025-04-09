@@ -52,7 +52,7 @@ func (c Controller) tick() {
 	//   |__the amount by which we can increase charging speed.
 
 	// We should call vehicle controller with
-	//   saved vehicle amps +/- calculated amp diff (whether we're increasing or decreasing speed,
+	//   saved vehicle amps +/- calculated amp diff (whether we're increasing or decreasing speed),
 	//   min 5A ... max 16A.
 }
 
