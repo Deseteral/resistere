@@ -21,8 +21,8 @@ func (c *TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) err
 	return cmd.Run()
 }
 
-func NewTeslaControlController(config *configuration.TeslaControl) TeslaControlController {
-	return TeslaControlController{
+func NewTeslaControlController(config *configuration.TeslaControl) *TeslaControlController {
+	return &TeslaControlController{
 		keyFilePath: config.KeyFile,
 	}
 }

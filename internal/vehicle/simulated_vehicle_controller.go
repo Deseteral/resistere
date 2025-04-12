@@ -6,6 +6,6 @@ func (c *SimulatedVehicleController) SetChargingAmps(vehicle *Vehicle, chargingA
 	return nil
 }
 
-func NewSimulatedVehicleController() SimulatedVehicleController {
-	return SimulatedVehicleController{}
+func NewSimulatedVehicleController() *SimulatedVehicleController {
+	return &SimulatedVehicleController{}
 }

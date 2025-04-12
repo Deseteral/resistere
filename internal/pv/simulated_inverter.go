@@ -6,6 +6,6 @@ func (i *SimulatedInverter) ReadEnergySurplus() (energySurplus float64, error er
 	return 5, nil
 }
 
-func NewSimulatedInverter() SimulatedInverter {
-	return SimulatedInverter{}
+func NewSimulatedInverter() *SimulatedInverter {
+	return &SimulatedInverter{}
 }
