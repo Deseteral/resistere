@@ -1,7 +1,14 @@
 import argparse
 import sys
+from dataclasses import dataclass
 
 from pysolarmanv5 import PySolarmanV5
+
+
+@dataclass
+class PvState:
+    power_production: float
+    power_consumption: float
 
 
 def main():
@@ -11,16 +18,16 @@ def main():
     parser.add_argument("port", type=int, help="Port number of the inverter.")
     args = parser.parse_args()
 
-    surplus = read_current_energy_surplus(args.ip, args.serial, args.port)
+    state = read_current_pv_state(args.ip, args.serial, args.port)
 
-    if surplus is not None:
-        print(surplus)
+    if state is not None:
+        print(f"{state.power_production} {state.power_consumption}")
         sys.exit(0)
     else:
         sys.exit(1)
 
 
-def read_current_energy_surplus(ip: str, serial: int, port: int) -> float | None:
+def read_current_pv_state(ip: str, serial: int, port: int) -> PvState | None:
     inverter = _connect_to_inverter(ip, serial, port)
     if inverter is None:
         return None
@@ -35,8 +42,7 @@ def read_current_energy_surplus(ip: str, serial: int, port: int) -> float | None
 
     inverter.disconnect()
 
-    surplus = max(pv_power - consumption, 0)
-    return surplus
+    return PvState(power_production=pv_power, power_consumption=consumption)
 
 
 def _read_single_address(address: int, inverter: PySolarmanV5) -> int | None:

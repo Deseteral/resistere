@@ -38,12 +38,12 @@ func (i *SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error err
 	}(binaryFilePath)
 
 	// Process and return output from Python binary.
-	energySurplus, err = i.execPythonBinary(binaryFilePath)
+	state, err := i.execPythonBinary(binaryFilePath)
 	if err != nil {
 		return -1, err
 	}
 
-	return energySurplus, nil
+	return state.powerProduction - state.powerConsumption, nil
 }
 
 func (i *SolarmanInverter) preparePythonBinary() (binaryPath string, error error) {
@@ -83,7 +83,7 @@ func (i *SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error
 	return nil
 }
 
-func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus float64, error error) {
+func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (pvState, error) {
 	cmd := exec.Command(binaryFilePath, i.ip, i.serial, i.port)
 
 	var buffer bytes.Buffer
@@ -92,18 +92,25 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplu
 	err := cmd.Run()
 	if err != nil {
 		log.Printf("solarman_interface failed to produce expeted output: %v", err)
-		return -1, err
+		return pvState{}, err
 	}
 
 	output := buffer.String()
+	values := strings.Split(output, " ")
 
-	energySurplus, err = strconv.ParseFloat(strings.TrimSpace(output), 64)
+	powerProduction, err := strconv.ParseFloat(strings.TrimSpace(values[0]), 64)
 	if err != nil {
 		log.Printf("Could not parse solarman_interface output: %v", err)
-		return -1, err
+		return pvState{}, err
 	}
 
-	return energySurplus, nil
+	powerConsumption, err := strconv.ParseFloat(strings.TrimSpace(values[1]), 64)
+	if err != nil {
+		log.Printf("Could not parse solarman_interface output: %v", err)
+		return pvState{}, err
+	}
+
+	return pvState{powerProduction: powerProduction, powerConsumption: powerConsumption}, nil
 }
 
 func NewSolarmanInverter(config *configuration.SolarmanInverter) *SolarmanInverter {
@@ -112,4 +119,9 @@ func NewSolarmanInverter(config *configuration.SolarmanInverter) *SolarmanInvert
 		serial: config.Serial,
 		port:   config.Port,
 	}
+}
+
+type pvState struct {
+	powerProduction  float64
+	powerConsumption float64
 }
