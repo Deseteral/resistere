@@ -57,9 +57,6 @@ func (c *Controller) tick() {
 		return
 	}
 
-	// Check with EVSE if there is a car charing.
-	// TODO
-
 	log.Println("Entering controller tick.")
 
 	// Save which car is charging and what's its current set amps.
