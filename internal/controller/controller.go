@@ -34,9 +34,6 @@ var modeName = map[Mode]string{
 func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
-	// Run first tick before ticker starts.
-	c.tick()
-
 	ticker := time.NewTicker(c.updateInterval)
 	go func() {
 		defer ticker.Stop()
