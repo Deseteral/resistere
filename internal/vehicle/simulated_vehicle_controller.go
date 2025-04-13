@@ -14,5 +14,7 @@ func (c *SimulatedVehicleController) SetChargingAmps(vehicle *Vehicle, chargingA
 }
 
 func NewSimulatedVehicleController() *SimulatedVehicleController {
-	return &SimulatedVehicleController{}
+	return &SimulatedVehicleController{
+		chargingAmps: 8,
+	}
 }
