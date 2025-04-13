@@ -53,12 +53,12 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 
 	chargeState, ok := data["chargeState"].(map[string]interface{})
 	if !ok {
-		return -1, errors.New("error parsing tesla-control state JSON")
+		return -1, errors.New("error parsing tesla-control state JSON: chargeState is undefined")
 	}
 
 	chargingState, ok := chargeState["chargingState"].(map[string]interface{})
 	if !ok {
-		return -1, errors.New("error parsing tesla-control state JSON")
+		return -1, errors.New("error parsing tesla-control state JSON: chargeState.chargingState is undefined")
 	}
 
 	_, charging := chargingState["Charging"]
