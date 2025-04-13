@@ -1,6 +1,9 @@
 package vehicle
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"github.com/deseteral/resistere/internal/configuration"
 	"os/exec"
 	"strconv"
@@ -8,6 +11,48 @@ import (
 
 type TeslaControlController struct {
 	keyFilePath string
+}
+
+func (c *TeslaControlController) IsCharging(vehicle *Vehicle) (isCharging bool, error error) {
+	cmd := exec.Command(
+		"tesla-control",
+		"-vin", vehicle.Vin,
+		"-key-file", c.keyFilePath,
+		"-ble",
+		"-command-timeout", "3s",
+		"-connect-timeout", "3s",
+		"state",
+	)
+
+	var buffer bytes.Buffer
+	cmd.Stdout = &buffer
+
+	err := cmd.Run()
+	if err != nil {
+		return false, err
+	}
+
+	output := buffer.String()
+
+	var data map[string]interface{}
+	err = json.Unmarshal([]byte(output), &data)
+	if err != nil {
+		return false, err
+	}
+
+	chargeState, ok := data["chargeState"].(map[string]interface{})
+	if !ok {
+		return false, errors.New("error parsing tesla-control state JSON")
+	}
+
+	chargingState, ok := chargeState["chargingState"].(map[string]interface{})
+	if !ok {
+		return false, errors.New("error parsing tesla-control state JSON")
+	}
+
+	_, charging := chargingState["Charging"]
+
+	return charging, nil
 }
 
 func (c *TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) error {
