@@ -10,6 +10,8 @@ import (
 )
 
 type Controller struct {
+	Vehicles []vehicle.Vehicle
+
 	mode              Mode
 	updateInterval    time.Duration
 	inverter          pv.Inverter
@@ -48,16 +50,43 @@ func (c *Controller) StartBackgroundTask() {
 }
 
 func (c *Controller) tick() {
-	// Check what mode we're in.
+	// The controller should only perform actions when the device is set to automatic mode.
+	// It must not interfere with charging process when manual mode is set.
 	if c.mode == ModeManual {
 		return
 	}
 
+	// Check with EVSE if there is a car charing.
+	// TODO
+
 	log.Println("Entering controller tick.")
 
-	// Check which car is in range and is charging.
-	// Save which one is charging and what is its current set amps.
-	// If none, log and return.
+	// Save which car is charging and what's its current set amps.
+	// If controller cannot communicate with any car (because none is in range, there was a communication error, etc.)
+	// it should stop further processing.
+	var selectedVehicle *vehicle.Vehicle = nil
+	var currentChargingAmps int
+	for _, v := range c.Vehicles {
+		chargingAmps, err := c.vehicleController.GetChargingAmps(&v)
+		if err != nil {
+			log.Printf("Could not communicate with the car %s: %v\n.", v.Name, err)
+			// Don't break the loop here. This car is probably just out of range. We should process next configured car.
+		}
+
+		if chargingAmps > 0 {
+			selectedVehicle = &v
+			currentChargingAmps = chargingAmps
+			// We only operate on one car, so if this one is in range and charging we can skip checking other cars.
+			break
+		}
+	}
+
+	if selectedVehicle == nil {
+		log.Println("No vehicle is charging. Exiting controller tick.")
+		return
+	}
+
+	log.Printf("Selected vehicle %s with %dA set.\n", selectedVehicle.Name, currentChargingAmps)
 
 	// Get energy surplus (kW) from inverter, change it to watts (* 1000).
 	//
@@ -70,10 +99,12 @@ func (c *Controller) tick() {
 	//   ^   ^   ^--this is always 230V in Europe, but it should be configurable.
 	//   |   |__the energy surplus, in watts, floored.
 	//   |__the amount by which we can increase charging speed.
+	// TODO
 
 	// We should call vehicle controller with
 	//   saved vehicle amps +/- calculated amp diff (whether we're increasing or decreasing speed),
 	//   min 5A ... max 16A.
+	// TODO
 }
 
 func (c *Controller) ChangeMode(mode Mode) {
@@ -85,11 +116,18 @@ func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
 	evse evse.Evse,
-	config *configuration.Controller,
+	config *configuration.Config,
 ) Controller {
+	var v []vehicle.Vehicle
+	for _, c := range config.Vehicles.Cars {
+		v = append(v, vehicle.Vehicle{Name: c.Name, Vin: c.Vin})
+	}
+
 	return Controller{
+		Vehicles: v,
+
 		mode:              ModeManual,
-		updateInterval:    time.Duration(config.CycleIntervalSeconds) * time.Second,
+		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
 		evse:              evse,
