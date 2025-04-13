@@ -13,6 +13,7 @@ type Config struct {
 	SolarmanInverter   SolarmanInverter   `toml:"solarman_inverter"`
 	TeslaControl       TeslaControl       `toml:"tesla_control"`
 	TeslaWallConnector TeslaWallConnector `toml:"tesla_wall_connector"`
+	Vehicles           Vehicles
 }
 
 type Web struct {
@@ -35,6 +36,15 @@ type TeslaControl struct {
 
 type TeslaWallConnector struct {
 	Ip string
+}
+
+type Vehicles struct {
+	Cars []Vehicle
+}
+
+type Vehicle struct {
+	Name string
+	Vin  string
 }
 
 func ReadConfig() (*Config, error) {
