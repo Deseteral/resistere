@@ -102,6 +102,8 @@ func (c *Controller) tick() {
 	//   saved vehicle amps +/- calculated amp diff (whether we're increasing or decreasing speed),
 	//   min 5A ... max 16A.
 	// TODO
+
+	log.Println("Controlled tick finished.")
 }
 
 func (c *Controller) ChangeMode(mode Mode) {
