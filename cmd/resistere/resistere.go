@@ -35,7 +35,7 @@ func startApplication() error {
 		inverter,
 		vehicleController,
 		wallbox,
-		&config.Controller,
+		config,
 	)
 	c.ChangeMode(controller.ModePVAutomatic) // TODO: This should be controlled by physical toggle switch.
 	c.StartBackgroundTask()
