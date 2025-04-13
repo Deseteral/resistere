@@ -34,6 +34,10 @@ var modeName = map[Mode]string{
 func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
+	// TODO: Currently every tick starts at set interval. This is not correct behaviour.
+	//       What should actually happen is each new tick should start at X second interval after the previous one ended
+	//       and not when it started.
+	//       If processing tick is longer then the interval, then the next tick will start immediately.
 	ticker := time.NewTicker(c.updateInterval)
 	go func() {
 		defer ticker.Stop()
