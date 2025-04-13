@@ -8,6 +8,7 @@ import (
 	"github.com/deseteral/resistere/internal/configuration"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 type TeslaControlController struct {
@@ -33,7 +34,7 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 
 	err := cmd.Run()
 	if err != nil {
-		stderrContent := errBuffer.String()
+		stderrContent := strings.TrimSuffix(errBuffer.String(), "\n")
 		return -1, errors.New(fmt.Sprintf("error while running tesla-control: %s", stderrContent))
 	}
 
