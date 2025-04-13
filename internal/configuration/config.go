@@ -48,7 +48,7 @@ type Vehicle struct {
 }
 
 func ReadConfig() (*Config, error) {
-	file, err := os.ReadFile("resistere_config.toml")
+	file, err := os.ReadFile("config.toml")
 	if err != nil {
 		log.Printf("Could not read config file: %v", err)
 		return nil, err

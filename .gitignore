@@ -2,5 +2,5 @@
 .DS_Store
 bin/
 internal/view/*.go
-resistere_config.toml
+config.toml
 deploy.sh
