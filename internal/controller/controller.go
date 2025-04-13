@@ -88,11 +88,12 @@ func (c *Controller) tick() {
 	log.Printf("Selected vehicle %s with %dA set.\n", selectedVehicle.Name, currentChargingAmps)
 
 	// Get energy surplus (kW) from inverter.
-	energySurplus, err := c.inverter.ReadEnergySurplus()
+	inverterState, err := c.inverter.ReadEnergySurplus()
 	if err != nil {
 		log.Printf("Could not read energy surplus from inverter: %v. Exiting controller tick.\n", err)
 		return
 	}
+	energySurplus := inverterState.PowerProduction - inverterState.PowerConsumption
 
 	// Add safety margin of 1kW to surplus, to ensure that we don't charge with energy from the grid.
 	energySurplus -= 1

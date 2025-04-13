@@ -23,11 +23,11 @@ type SolarmanInverter struct {
 	port   string
 }
 
-func (i *SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error error) {
+func (i *SolarmanInverter) ReadEnergySurplus() (InverterState, error) {
 	// Extract Python binary to tmp location for running.
 	binaryFilePath, err := i.preparePythonBinary()
 	if err != nil {
-		return -1, err
+		return InverterState{}, err
 	}
 
 	// Remove Python binary from tmp location after we're done reading.
@@ -40,10 +40,10 @@ func (i *SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error err
 	// Process and return output from Python binary.
 	state, err := i.execPythonBinary(binaryFilePath)
 	if err != nil {
-		return -1, err
+		return InverterState{}, err
 	}
 
-	return state.powerProduction - state.powerConsumption, nil
+	return state, nil
 }
 
 func (i *SolarmanInverter) preparePythonBinary() (binaryPath string, error error) {
@@ -83,7 +83,7 @@ func (i *SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error
 	return nil
 }
 
-func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (pvState, error) {
+func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (InverterState, error) {
 	cmd := exec.Command(binaryFilePath, i.ip, i.serial, i.port)
 
 	var buffer bytes.Buffer
@@ -92,7 +92,7 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (pvState, err
 	err := cmd.Run()
 	if err != nil {
 		log.Printf("solarman_interface failed to produce expeted output: %v", err)
-		return pvState{}, err
+		return InverterState{}, err
 	}
 
 	output := buffer.String()
@@ -101,16 +101,17 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (pvState, err
 	powerProduction, err := strconv.ParseFloat(strings.TrimSpace(values[0]), 64)
 	if err != nil {
 		log.Printf("Could not parse solarman_interface output: %v", err)
-		return pvState{}, err
+		return InverterState{}, err
 	}
 
 	powerConsumption, err := strconv.ParseFloat(strings.TrimSpace(values[1]), 64)
 	if err != nil {
 		log.Printf("Could not parse solarman_interface output: %v", err)
-		return pvState{}, err
+		return InverterState{}, err
 	}
 
-	return pvState{powerProduction: powerProduction, powerConsumption: powerConsumption}, nil
+	state := InverterState{PowerProduction: powerProduction, PowerConsumption: powerConsumption}
+	return state, nil
 }
 
 func NewSolarmanInverter(config *configuration.SolarmanInverter) *SolarmanInverter {
@@ -119,9 +120,4 @@ func NewSolarmanInverter(config *configuration.SolarmanInverter) *SolarmanInvert
 		serial: config.Serial,
 		port:   config.Port,
 	}
-}
-
-type pvState struct {
-	powerProduction  float64
-	powerConsumption float64
 }
