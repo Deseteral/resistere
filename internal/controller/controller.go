@@ -10,10 +10,23 @@ import (
 )
 
 type Controller struct {
+	mode              Mode
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
 	evse              evse.Evse
+}
+
+type Mode int
+
+const (
+	ModePVAutomatic Mode = iota
+	ModeManual
+)
+
+var modeName = map[Mode]string{
+	ModePVAutomatic: "PV Automatic",
+	ModeManual:      "Manual",
 }
 
 func (c *Controller) StartBackgroundTask() {
@@ -35,6 +48,11 @@ func (c *Controller) StartBackgroundTask() {
 }
 
 func (c *Controller) tick() {
+	// Check what mode we're in.
+	if c.mode == ModeManual {
+		return
+	}
+
 	log.Println("Entering controller tick.")
 
 	// Check which car is in range and is charging.
@@ -58,6 +76,11 @@ func (c *Controller) tick() {
 	//   min 5A ... max 16A.
 }
 
+func (c *Controller) ChangeMode(mode Mode) {
+	log.Printf("Setting controller mode to %v.\n", modeName[mode])
+	c.mode = mode
+}
+
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
@@ -65,6 +88,7 @@ func NewController(
 	config *configuration.Controller,
 ) Controller {
 	return Controller{
+		mode:              ModeManual,
 		updateInterval:    time.Duration(config.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
