@@ -15,9 +15,9 @@ import (
 var solarmanInterfaceBinary embed.FS
 
 type SolarmanInverter struct {
-	Ip     string
-	Serial string
-	Port   string
+	ip     string
+	serial string
+	port   string
 }
 
 func (i *SolarmanInverter) ReadEnergySurplus() (energySurplus float64, error error) {
@@ -81,7 +81,7 @@ func (i *SolarmanInverter) cleanupSolarmanInterface(binaryFilePath string) error
 }
 
 func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplus float64, error error) {
-	cmd := exec.Command(binaryFilePath, i.Ip, i.Serial, i.Port)
+	cmd := exec.Command(binaryFilePath, i.ip, i.serial, i.port)
 
 	var buffer bytes.Buffer
 	cmd.Stdout = &buffer
@@ -105,8 +105,8 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (energySurplu
 
 func NewSolarmanInverter(config *configuration.SolarmanInverter) *SolarmanInverter {
 	return &SolarmanInverter{
-		Ip:     config.Ip,
-		Serial: config.Serial,
-		Port:   config.Port,
+		ip:     config.Ip,
+		serial: config.Serial,
+		port:   config.Port,
 	}
 }

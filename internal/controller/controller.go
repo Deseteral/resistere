@@ -35,7 +35,7 @@ func (c *Controller) StartBackgroundTask() {
 }
 
 func (c *Controller) tick() {
-	log.Println("Starting controller tick.")
+	log.Println("Entering controller tick.")
 
 	// Check which car is in range and is charging.
 	// Save which one is charging and what is its current set amps.
