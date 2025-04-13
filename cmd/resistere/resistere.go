@@ -37,6 +37,7 @@ func startApplication() error {
 		wallbox,
 		&config.Controller,
 	)
+	c.ChangeMode(controller.ModePVAutomatic) // TODO: This should be controlled by physical toggle switch.
 	c.StartBackgroundTask()
 
 	err = webapp.StartWebServerBlocking(config)
