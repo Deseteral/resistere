@@ -13,7 +13,7 @@ type TeslaControlController struct {
 	keyFilePath string
 }
 
-func (c *TeslaControlController) IsCharging(vehicle *Vehicle) (isCharging bool, error error) {
+func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, error error) {
 	cmd := exec.Command(
 		"tesla-control",
 		"-vin", vehicle.Vin,
@@ -29,7 +29,7 @@ func (c *TeslaControlController) IsCharging(vehicle *Vehicle) (isCharging bool, 
 
 	err := cmd.Run()
 	if err != nil {
-		return false, err
+		return -1, err
 	}
 
 	output := buffer.String()
@@ -37,22 +37,27 @@ func (c *TeslaControlController) IsCharging(vehicle *Vehicle) (isCharging bool, 
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(output), &data)
 	if err != nil {
-		return false, err
+		return -1, err
 	}
 
 	chargeState, ok := data["chargeState"].(map[string]interface{})
 	if !ok {
-		return false, errors.New("error parsing tesla-control state JSON")
+		return -1, errors.New("error parsing tesla-control state JSON")
 	}
 
 	chargingState, ok := chargeState["chargingState"].(map[string]interface{})
 	if !ok {
-		return false, errors.New("error parsing tesla-control state JSON")
+		return -1, errors.New("error parsing tesla-control state JSON")
 	}
 
 	_, charging := chargingState["Charging"]
+	if !charging {
+		return -1, nil
+	}
 
-	return charging, nil
+	amps = chargeState["chargingAmps"].(int)
+
+	return amps, nil
 }
 
 func (c *TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) error {
