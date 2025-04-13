@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
 	"github.com/deseteral/resistere/internal/evse"
@@ -39,10 +38,6 @@ func startApplication() error {
 		&config.Controller,
 	)
 	c.StartBackgroundTask()
-
-	// TODO: Test. Please remove.
-	isVehicleConnected, err := wallbox.IsVehicleConnected()
-	fmt.Println(isVehicleConnected)
 
 	err = webapp.StartWebServerBlocking(config)
 	if err != nil {
