@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
 	"github.com/deseteral/resistere/internal/webapp"
@@ -17,22 +19,30 @@ func startApplication() error {
 
 	var inverter pv.Inverter
 	var vehicleController vehicle.Controller
+	var wallbox evse.Evse
 
 	if config.SimulatorMode {
 		log.Println("Running in simulator mode.")
 		inverter = pv.NewSimulatedInverter()
 		vehicleController = vehicle.NewSimulatedVehicleController()
+		wallbox = evse.NewSimulatedEvse()
 	} else {
 		inverter = pv.NewSolarmanInverter(&config.SolarmanInverter)
 		vehicleController = vehicle.NewTeslaControlController(&config.TeslaControl)
+		wallbox = evse.NewTeslaWallConnector(&config.TeslaWallConnector)
 	}
 
 	c := controller.NewController(
 		inverter,
 		vehicleController,
+		wallbox,
 		&config.Controller,
 	)
 	c.StartBackgroundTask()
+
+	// TODO: Test. Please remove.
+	isVehicleConnected, err := wallbox.IsVehicleConnected()
+	fmt.Println(isVehicleConnected)
 
 	err = webapp.StartWebServerBlocking(config)
 	if err != nil {

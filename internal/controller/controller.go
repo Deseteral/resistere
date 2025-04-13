@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/deseteral/resistere/internal/configuration"
+	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
 	"log"
@@ -12,6 +13,7 @@ type Controller struct {
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
+	evse              evse.Evse
 }
 
 func (c *Controller) StartBackgroundTask() {
@@ -59,11 +61,13 @@ func (c *Controller) tick() {
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
+	evse evse.Evse,
 	config *configuration.Controller,
 ) Controller {
 	return Controller{
 		updateInterval:    time.Duration(config.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
+		evse:              evse,
 	}
 }

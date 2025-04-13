@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	Web              Web
-	Controller       Controller
-	SolarmanInverter SolarmanInverter `toml:"solarman_inverter"`
-	TeslaControl     TeslaControl     `toml:"tesla_control"`
-	SimulatorMode    bool             `toml:"simulator_mode"`
+	SimulatorMode      bool `toml:"simulator_mode"`
+	Web                Web
+	Controller         Controller
+	SolarmanInverter   SolarmanInverter   `toml:"solarman_inverter"`
+	TeslaControl       TeslaControl       `toml:"tesla_control"`
+	TeslaWallConnector TeslaWallConnector `toml:"tesla_wall_connector"`
 }
 
 type Web struct {
@@ -30,6 +31,10 @@ type SolarmanInverter struct {
 
 type TeslaControl struct {
 	KeyFile string `toml:"key_file"`
+}
+
+type TeslaWallConnector struct {
+	Ip string
 }
 
 func ReadConfig() (*Config, error) {
