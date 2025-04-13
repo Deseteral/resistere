@@ -5,11 +5,6 @@ build:
 	go build -o ./bin/resistere ./cmd/resistere
 	@echo ""
 
-build_release:
-	@echo "Building release version of application"
-	go build -ldflags "-s -w" -o ./bin/resistere ./cmd/resistere
-	@echo ""
-
 run:
 	@echo "Running application"
 	./bin/resistere
@@ -24,4 +19,15 @@ solarman_interface_binary:
 	mkdir -p ./internal/pv/solarman_interface/build
 	python3 -m zipapp ./internal/pv/solarman_interface/src -m "main:main" -o ./internal/pv/solarman_interface/build/solarman_interface.pyz -p "/usr/bin/env python3"
 	chmod u+x ./internal/pv/solarman_interface/build/solarman_interface.pyz
+	@echo ""
+
+release_rpi: templ solarman_interface_binary
+	mkdir -p "./bin/release"
+
+	@echo "Building release version of application"
+	GOOS="linux" GOARCH="arm64" go build -ldflags "-s -w" -o ./bin/release/resistere ./cmd/resistere
+	@echo ""
+
+	@echo "Copy scripts"
+	cp ./scripts/* ./bin/release/
 	@echo ""
