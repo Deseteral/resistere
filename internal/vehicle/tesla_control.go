@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/deseteral/resistere/internal/configuration"
 	"os/exec"
 	"strconv"
@@ -24,15 +25,19 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		"state",
 	)
 
-	var buffer bytes.Buffer
-	cmd.Stdout = &buffer
+	var outBuffer bytes.Buffer
+	cmd.Stdout = &outBuffer
+
+	var errBuffer bytes.Buffer
+	cmd.Stderr = &errBuffer
 
 	err := cmd.Run()
 	if err != nil {
-		return -1, err
+		stderrContent := errBuffer.String()
+		return -1, errors.New(fmt.Sprintf("error while running tesla-control: %s", stderrContent))
 	}
 
-	output := buffer.String()
+	output := outBuffer.String()
 
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(output), &data)

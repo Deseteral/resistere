@@ -3,3 +3,4 @@
 bin/
 internal/view/*.go
 resistere_config.toml
+deploy.sh
