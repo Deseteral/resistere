@@ -146,7 +146,6 @@ func (c *Controller) ChangeMode(mode Mode) {
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
-	evse evse.Evse,
 	config *configuration.Config,
 ) Controller {
 	var v []vehicle.Vehicle
@@ -161,6 +160,5 @@ func NewController(
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
-		evse:              evse,
 	}
 }

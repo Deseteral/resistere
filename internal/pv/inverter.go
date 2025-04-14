@@ -1,6 +1,7 @@
 package pv
 
 type Inverter interface {
+	// ReadEnergySurplus TODO: Rename.
 	ReadEnergySurplus() (InverterState, error)
 }
 
