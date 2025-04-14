@@ -43,6 +43,8 @@ func (i *SolarmanInverter) ReadEnergySurplus() (InverterState, error) {
 		return InverterState{}, err
 	}
 
+	log.Printf("Read from Solarman inverter: production %fkW, consuption %fkW.\n", state.PowerProduction, state.PowerConsumption)
+
 	return state, nil
 }
 
