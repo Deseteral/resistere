@@ -26,8 +26,8 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		"-vin", vehicle.Vin,
 		"-key-file", c.keyFilePath,
 		"-ble",
-		"-command-timeout", "3s",
-		"-connect-timeout", "3s",
+		"-command-timeout", "10s",
+		"-connect-timeout", "10s",
 		"state", "charge",
 	)
 
