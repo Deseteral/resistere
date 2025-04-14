@@ -28,7 +28,7 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		"-ble",
 		"-command-timeout", "3s",
 		"-connect-timeout", "3s",
-		"state",
+		"state", "charge",
 	)
 
 	var outBuffer bytes.Buffer
@@ -66,7 +66,7 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		return -1, nil
 	}
 
-	amps = chargeState["chargingAmps"].(int)
+	amps = int(chargeState["chargingAmps"].(float64))
 
 	return amps, nil
 }
