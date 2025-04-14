@@ -73,6 +73,12 @@ func (i *SolarmanInverter) preparePythonBinary() (binaryPath string, error error
 		return "", err
 	}
 
+	err = os.Chmod(tmpFile.Name(), 0777)
+	if err != nil {
+		log.Printf("Failed to set permiossions for solarman_interface binary: %v", err)
+		return "", err
+	}
+
 	return tmpFile.Name(), nil
 }
 
