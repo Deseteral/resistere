@@ -101,6 +101,7 @@ func (c *Controller) tick() {
 	energySurplus := inverterState.PowerProduction - inverterState.PowerConsumption
 
 	// Add safety margin of 1kW to surplus, to ensure that we don't charge with energy from the grid.
+	// TODO: Safety margin should be configurable.
 	energySurplus -= 1
 
 	// Convert from kilowatts to watts.

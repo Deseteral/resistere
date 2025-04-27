@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/deseteral/resistere/internal/configuration"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/deseteral/resistere/internal/configuration"
 )
 
 // TODO: This implementation is kind of stupid.
@@ -45,18 +46,18 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 
 	output := outBuffer.String()
 
-	var data map[string]interface{}
+	var data map[string]any
 	err = json.Unmarshal([]byte(output), &data)
 	if err != nil {
 		return -1, err
 	}
 
-	chargeState, ok := data["chargeState"].(map[string]interface{})
+	chargeState, ok := data["chargeState"].(map[string]any)
 	if !ok {
 		return -1, errors.New("error parsing tesla-control state JSON: chargeState is undefined")
 	}
 
-	chargingState, ok := chargeState["chargingState"].(map[string]interface{})
+	chargingState, ok := chargeState["chargingState"].(map[string]any)
 	if !ok {
 		return -1, errors.New("error parsing tesla-control state JSON: chargeState.chargingState is undefined")
 	}
@@ -66,7 +67,11 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		return -1, nil
 	}
 
-	amps = int(chargeState["chargingAmps"].(float64))
+	chargingAmpsRaw, ok := chargeState["chargingAmpsssssss"].(float64)
+	if !ok {
+		return -1, nil
+	}
+	amps = int(chargingAmpsRaw)
 
 	return amps, nil
 }
