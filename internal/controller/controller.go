@@ -81,7 +81,7 @@ func (c *Controller) tick() {
 			// We only operate on one car, so if this one is in range and charging we can skip checking other cars.
 			break
 		} else {
-			log.Printf("Car %s is in-range but not charging.", v.Name)
+			log.Printf("Car %s is in-range but not charging.\n", v.Name)
 		}
 	}
 
