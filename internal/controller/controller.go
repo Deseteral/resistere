@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"log"
+	"math"
+	"time"
+
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
-	"log"
-	"math"
-	"time"
 )
 
 type Controller struct {
@@ -71,6 +72,7 @@ func (c *Controller) tick() {
 		if err != nil {
 			log.Printf("Could not communicate with the car %s: %v.\n", v.Name, err)
 			// Don't break the loop here. This car is probably just out of range. We should process next configured car.
+			continue
 		}
 
 		if chargingAmps > 0 {
@@ -78,6 +80,8 @@ func (c *Controller) tick() {
 			currentChargingAmps = chargingAmps
 			// We only operate on one car, so if this one is in range and charging we can skip checking other cars.
 			break
+		} else {
+			log.Printf("Car %s is in-range but not charging.", v.Name)
 		}
 	}
 
