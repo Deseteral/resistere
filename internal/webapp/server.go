@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/deseteral/resistere/internal/configuration"
@@ -29,7 +30,7 @@ func StartWebServerBlocking(config *configuration.Config, controller *controller
 	router := http.NewServeMux()
 
 	router.Handle("GET /", templ.Handler(view.Index()))
-	router.HandleFunc("POST /controller/mode/toggle", postToggleControllerMode(controller))
+	router.HandleFunc("POST /controller/mode", postChangeControllerMode(controller))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 
 	log.Printf("Web server starting on port %v.\n", config.Web.Port)
@@ -43,9 +44,29 @@ func StartWebServerBlocking(config *configuration.Config, controller *controller
 	return nil
 }
 
-func postToggleControllerMode(controller *controller.Controller) http.HandlerFunc {
+func postChangeControllerMode(c *controller.Controller) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		controller.ToggleMode()
+		value := r.URL.Query().Get("value")
+
+		if value == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		castedValue, err := strconv.Atoi(value)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		nextMode, err := controller.ParseIntToMode(castedValue)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		c.ChangeMode(nextMode)
+
 		w.WriteHeader(http.StatusOK)
 	}
 }

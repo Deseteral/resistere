@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -31,6 +33,14 @@ const (
 var modeName = map[Mode]string{
 	ModePVAutomatic: "PV Automatic",
 	ModeManual:      "Manual",
+}
+
+func ParseIntToMode(value int) (Mode, error) {
+	if value > int(ModeManual) {
+		return -1, errors.New(fmt.Sprintf("could not parse value %d to Mode", value))
+	}
+
+	return Mode(value), nil
 }
 
 func (c *Controller) StartBackgroundTask() {
@@ -146,14 +156,6 @@ func (c *Controller) tick() {
 func (c *Controller) ChangeMode(mode Mode) {
 	log.Printf("Setting controller mode to %v.\n", modeName[mode])
 	c.mode = mode
-}
-
-func (c *Controller) ToggleMode() {
-	if c.mode == ModePVAutomatic {
-		c.ChangeMode(ModeManual)
-	} else {
-		c.ChangeMode(ModePVAutomatic)
-	}
 }
 
 func NewController(
