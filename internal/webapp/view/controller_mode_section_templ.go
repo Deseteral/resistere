@@ -80,7 +80,33 @@ func ControllerModeSection(c *controller.Controller) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "><i class=\"ph-bold ph-hand-tap\"></i> Manual</button></div></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "><i class=\"ph-bold ph-hand-tap\"></i> Manual</button></div><div><style>\n\t\t\tme {\n\t\t\t\tmargin-top: 8px;\n\t\t\t}\n\t\t\t</style>Current mode: <strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(getModeName(c.Mode))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 49, Col: 46}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</strong><p><style>\n\t\t\t\tme {\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tfont-style: italic;\n\t\t\t\t}\n\t\t\t\t</style><i class=\"ph-bold ph-info\"></i> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getHelpMessageForMode(c.Mode))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 59, Col: 35}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p></div></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -94,6 +120,24 @@ func getUrlForModeButton(buttonMode controller.Mode) string {
 
 func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mode) bool {
 	return buttonMode == currentMode
+}
+
+// TODO: This should be handled by i18n mechanism.
+func getModeName(mode controller.Mode) string {
+	if mode == controller.ModePVAutomatic {
+		return "Automatic"
+	} else {
+		return "Manual"
+	}
+}
+
+// TODO: This should be handled by i18n mechanism.
+func getHelpMessageForMode(mode controller.Mode) string {
+	if mode == controller.ModePVAutomatic {
+		return "Charging current is being controlled to maximise the production from PV. This will result in slower charging speeds."
+	} else {
+		return "Charging current is not being set automatically. You can change the current from inside the vehicle or via mobile app. This may result in faster charging speeds but may lead to higher usage of grid power."
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

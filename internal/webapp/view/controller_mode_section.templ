@@ -39,6 +39,26 @@ templ ControllerModeSection(c *controller.Controller) {
 				Manual
 			</button>
 		</div>
+
+		<div>
+			<style>
+			me {
+				margin-top: 8px;
+			}
+			</style>
+			Current mode: <strong>{ getModeName(c.Mode) }</strong>
+			<p>
+				<style>
+				me {
+					font-size: 13px;
+					font-style: italic;
+				}
+				</style>
+
+				<i class="ph-bold ph-info"></i>
+				{ getHelpMessageForMode(c.Mode) }
+			</p>
+		</div>
 	</fieldset>
 }
 
@@ -48,4 +68,22 @@ func getUrlForModeButton(buttonMode controller.Mode) string {
 
 func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mode) bool {
 	return buttonMode == currentMode
+}
+
+// TODO: This should be handled by i18n mechanism.
+func getModeName(mode controller.Mode) string {
+	if mode == controller.ModePVAutomatic {
+		return "Automatic"
+	} else {
+		return "Manual"
+	}
+}
+
+// TODO: This should be handled by i18n mechanism.
+func getHelpMessageForMode(mode controller.Mode) string {
+	if mode == controller.ModePVAutomatic {
+		return "Charging current is being controlled to maximise the production from PV. This will result in slower charging speeds."
+	} else {
+		return "Charging current is not being set automatically. You can change the current from inside the vehicle or via mobile app. This may result in faster charging speeds but may lead to higher usage of grid power."
+	}
 }
