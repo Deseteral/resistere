@@ -34,14 +34,14 @@ func ControllerModeSection(c *controller.Controller) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset id=\"controller-mode-section\"><legend>Controller mode</legend><div hx-target=\"#controller-mode-section\" hx-swap=\"outerHTML\"><style>\n\t\t\tme {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\t\t\t}\n\t\t\t</style><button hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset id=\"controller-mode-section\"><legend>Controller mode</legend><div hx-target=\"#controller-mode-section\" hx-swap=\"outerHTML\"><style>\n\t\t\tme {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\n\t\t\t\tbutton {\n\t\t\t\t\twidth: 130px;\n\t\t\t\t}\n\t\t\t}\n\t\t\t</style><button hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModePVAutomatic))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 24, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 28, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -64,7 +64,7 @@ func ControllerModeSection(c *controller.Controller) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModeManual))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 31, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 35, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
