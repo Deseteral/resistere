@@ -1,6 +1,10 @@
 package view
 
-templ Index() {
+import (
+	"github.com/deseteral/resistere/internal/controller"
+)
+
+templ Index(c *controller.Controller) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -19,7 +23,9 @@ templ Index() {
 			<title>resistere</title>
 		</head>
 		<body hx-boost="true">
-            <h1>resistere</h1>
+			<h1>resistere</h1>
+
+			@ControllerModeSection(c)
 		</body>
 	</html>
 }

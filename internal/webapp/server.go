@@ -17,7 +17,7 @@ import (
 //go:embed static
 var staticFiles embed.FS
 
-func StartWebServerBlocking(config *configuration.Config, controller *controller.Controller) error {
+func StartWebServerBlocking(config *configuration.Config, c *controller.Controller) error {
 	addr := fmt.Sprintf(":%v", config.Web.Port)
 
 	var staticFs = fs.FS(staticFiles)
@@ -29,8 +29,8 @@ func StartWebServerBlocking(config *configuration.Config, controller *controller
 
 	router := http.NewServeMux()
 
-	router.Handle("GET /", templ.Handler(view.Index()))
-	router.HandleFunc("POST /controller/mode", postChangeControllerMode(controller))
+	router.Handle("GET /", templ.Handler(view.Index(c)))
+	router.HandleFunc("POST /controller/mode", postChangeControllerMode(c))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 
 	log.Printf("Web server starting on port %v.\n", config.Web.Port)
@@ -67,6 +67,6 @@ func postChangeControllerMode(c *controller.Controller) http.HandlerFunc {
 
 		c.ChangeMode(nextMode)
 
-		w.WriteHeader(http.StatusOK)
+		view.ControllerModeSection(c).Render(r.Context(), w)
 	}
 }

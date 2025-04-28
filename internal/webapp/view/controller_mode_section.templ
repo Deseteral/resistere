@@ -1,0 +1,45 @@
+package view
+
+import (
+	"fmt"
+	"github.com/deseteral/resistere/internal/controller"
+)
+
+templ ControllerModeSection(c *controller.Controller) {
+	<fieldset id="controller-mode-section">
+		<legend>Controller mode</legend>
+
+		<div
+			hx-target="#controller-mode-section"
+			hx-swap="outerHTML"
+		>
+			<style>
+			me {
+				display: flex;
+				flex-direction: row;
+			}
+			</style>
+
+			<button
+				hx-post={ getUrlForModeButton(controller.ModePVAutomatic) }
+				disabled?={ isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) }
+			>
+				Automatic
+			</button>
+			<button
+				hx-post={ getUrlForModeButton(controller.ModeManual) }
+				disabled?={ isModeButtonDisabled(controller.ModeManual, c.Mode) }
+			>
+				Manual
+			</button>
+		</div>
+	</fieldset>
+}
+
+func getUrlForModeButton(buttonMode controller.Mode) string {
+	return fmt.Sprintf("/controller/mode?value=%d", int(buttonMode))
+}
+
+func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mode) bool {
+	return buttonMode == currentMode
+}

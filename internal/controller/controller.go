@@ -15,8 +15,8 @@ import (
 
 type Controller struct {
 	Vehicles []vehicle.Vehicle
+	Mode     Mode
 
-	mode              Mode
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
@@ -65,7 +65,7 @@ func (c *Controller) StartBackgroundTask() {
 func (c *Controller) tick() {
 	// The controller should only perform actions when the device is set to automatic mode.
 	// It must not interfere with charging process when manual mode is set.
-	if c.mode == ModeManual {
+	if c.Mode == ModeManual {
 		return
 	}
 
@@ -155,7 +155,7 @@ func (c *Controller) tick() {
 
 func (c *Controller) ChangeMode(mode Mode) {
 	log.Printf("Setting controller mode to %v.\n", modeName[mode])
-	c.mode = mode
+	c.Mode = mode
 }
 
 func NewController(
@@ -170,8 +170,8 @@ func NewController(
 
 	return Controller{
 		Vehicles: v,
+		Mode:     ModeManual,
 
-		mode:              ModeManual,
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
