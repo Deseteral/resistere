@@ -24,12 +24,14 @@ templ ControllerModeSection(c *controller.Controller) {
 				hx-post={ getUrlForModeButton(controller.ModePVAutomatic) }
 				disabled?={ isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) }
 			>
+				<i class="ph-bold ph-sun"></i>
 				Automatic
 			</button>
 			<button
 				hx-post={ getUrlForModeButton(controller.ModeManual) }
 				disabled?={ isModeButtonDisabled(controller.ModeManual, c.Mode) }
 			>
+				<i class="ph-bold ph-hand-tap"></i>
 				Manual
 			</button>
 		</div>
