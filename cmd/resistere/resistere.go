@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
 	"github.com/deseteral/resistere/internal/webapp"
-	"log"
 )
 
 func startApplication() error {
@@ -32,10 +33,14 @@ func startApplication() error {
 		vehicleController,
 		config,
 	)
-	c.ChangeMode(controller.ModePVAutomatic) // TODO: This should be controlled by physical toggle switch.
+
+	// TODO: Mode should be persisted between processes. New process should inherit the mode of the last running one.
+	// TODO: This should be controlled by physical toggle switch.
+	c.ChangeMode(controller.ModePVAutomatic)
+
 	c.StartBackgroundTask()
 
-	err = webapp.StartWebServerBlocking(config)
+	err = webapp.StartWebServerBlocking(config, &c)
 	if err != nil {
 		return err
 	}

@@ -148,6 +148,14 @@ func (c *Controller) ChangeMode(mode Mode) {
 	c.mode = mode
 }
 
+func (c *Controller) ToggleMode() {
+	if c.mode == ModePVAutomatic {
+		c.ChangeMode(ModeManual)
+	} else {
+		c.ChangeMode(ModePVAutomatic)
+	}
+}
+
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
