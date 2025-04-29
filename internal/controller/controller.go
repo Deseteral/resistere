@@ -8,6 +8,7 @@ import (
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/pv"
+	"github.com/deseteral/resistere/internal/utils"
 	"github.com/deseteral/resistere/internal/vehicle"
 )
 
@@ -110,14 +111,10 @@ func (c *Controller) tick() {
 
 	log.Printf("Calculated delta amps: %dA.\n", deltaAmps)
 
-	// Calculate the charging amps the car should use.
+	// Calculate charging amps the car should use.
 	// It has to be between 5A and 16A (min and max charging amps for 3kW and 11kW).
 	nextAmps := currentChargingAmps + deltaAmps
-	if nextAmps < 5 {
-		nextAmps = 5
-	} else if nextAmps > 16 {
-		nextAmps = 16
-	}
+	nextAmps = utils.Clamp(nextAmps, 5, 16)
 
 	// Send next charging amps value to the car.
 	log.Printf("Setting charging amps to %dA for car %s.\n", nextAmps, selectedVehicle.Name)
