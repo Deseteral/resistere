@@ -67,7 +67,7 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 		return -1, nil
 	}
 
-	chargingAmpsRaw, ok := chargeState["chargingAmpsssssss"].(float64)
+	chargingAmpsRaw, ok := chargeState["chargingAmps"].(float64)
 	if !ok {
 		return -1, nil
 	}
