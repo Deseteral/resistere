@@ -93,14 +93,14 @@ func ControllerModeSection(c *controller.Controller) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</strong><p><style>\n\t\t\t\tme {\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tfont-style: italic;\n\t\t\t\t}\n\t\t\t\t</style><i class=\"ph-bold ph-info\"></i> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</strong><p><style>\n\t\t\t\tme {\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tfont-style: italic;\n\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: row;\n\t\t\t\t\talign-items: center;\n\n\t\t\t\t\ti {\n\t\t\t\t\t\tmargin-right: 4px;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t</style><i class=\"ph-bold ph-info\"></i> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getHelpMessageForMode(c.Mode))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 59, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 67, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {

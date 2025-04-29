@@ -153,6 +153,10 @@ func (c *Controller) tick() {
 	log.Println("Controlled tick finished successfully.")
 }
 
+// TODO: When set to manual it should return back to automatic after certain time (10 minutes?) of not charging.
+//
+//	This is important as "automatic" is the default, and leaving the controller running in manual
+//	could lead to accidental grid usage.
 func (c *Controller) ChangeMode(mode Mode) {
 	log.Printf("Setting controller mode to %v.\n", modeName[mode])
 	c.Mode = mode
