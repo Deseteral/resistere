@@ -7,6 +7,7 @@ import (
 
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/evse"
+	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/utils"
 	"github.com/deseteral/resistere/internal/vehicle"
@@ -20,6 +21,7 @@ type Controller struct {
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
 	evse              evse.Evse
+	metricsRegistry   *metrics.Registry
 }
 
 func (c *Controller) StartBackgroundTask() {
@@ -50,29 +52,45 @@ func (c *Controller) tick() {
 
 	log.Println("Entering controller tick.")
 
+	metricsFrame := metrics.Frame{}
+	metricsFrame.Timestamp = time.Now()
+
 	// Save which car is charging and what's its current set amps.
 	// If controller cannot communicate with any car (because none is in range, there was a communication error, etc.)
 	// it should stop further processing.
 	// TODO: Perhaps this could be running in parallel.
 	var selectedVehicle *vehicle.Vehicle = nil
 	var currentChargingAmps int
+	var selectedVehicleMetricsFrame *metrics.VehicleFrame
+	var vehicleMetrics []metrics.VehicleFrame
+
 	for _, v := range c.Vehicles {
+		vehicleMetricsFrame := metrics.NewVehicleMetricsFrame()
+		vehicleMetricsFrame.Name = v.Name
+
 		chargingAmps, err := c.vehicleController.GetChargingAmps(&v)
+
 		if err != nil {
 			log.Printf("Could not communicate with the car %s: %v.\n", v.Name, err)
+
 			// Don't break the loop here. This car is probably just out of range. We should process next configured car.
 			continue
 		}
 
+		vehicleMetricsFrame.IsInRange = true
+
 		if chargingAmps > 0 {
 			selectedVehicle = &v
 			currentChargingAmps = chargingAmps
-			// We only operate on one car, so if this one is in range and charging we can skip checking other cars.
-			break
+			selectedVehicleMetricsFrame = &vehicleMetricsFrame
+
+			selectedVehicleMetricsFrame.SetChargingAmps = chargingAmps
 		} else {
 			log.Printf("Car %s is in-range but not charging.\n", v.Name)
+
 		}
 	}
+	metricsFrame.VehicleFrames = vehicleMetrics
 
 	if selectedVehicle == nil {
 		log.Println("No vehicle is charging. Exiting controller tick.")
@@ -87,6 +105,10 @@ func (c *Controller) tick() {
 		log.Printf("Could not read energy surplus from inverter: %v. Exiting controller tick.\n", err)
 		return
 	}
+
+	metricsFrame.PowerProductionWatts = inverterState.PowerProduction
+	metricsFrame.PowerConsumptionWatts = inverterState.PowerConsumption
+
 	energySurplus := inverterState.PowerProduction - inverterState.PowerConsumption
 
 	// Convert from kilowatts to watts.
@@ -123,7 +145,11 @@ func (c *Controller) tick() {
 	if err != nil {
 		log.Printf("Could not set charging amps for car %s: %v. Exiting controller tick.\n", selectedVehicle.Name, err)
 		return
+	} else {
+		selectedVehicleMetricsFrame.SetChargingAmps = nextAmps
 	}
+
+	c.metricsRegistry.LatestFrame = metricsFrame
 
 	log.Println("Controlled tick finished successfully.")
 }
@@ -141,6 +167,7 @@ func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
 	config *configuration.Config,
+	metricsRegistry *metrics.Registry,
 ) Controller {
 	var v []vehicle.Vehicle
 	for _, c := range config.Vehicles.Cars {
@@ -154,5 +181,6 @@ func NewController(
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
+		metricsRegistry:   metricsRegistry,
 	}
 }

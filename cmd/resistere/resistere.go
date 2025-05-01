@@ -5,6 +5,7 @@ import (
 
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
 	"github.com/deseteral/resistere/internal/webapp"
@@ -28,10 +29,13 @@ func startApplication() error {
 		vehicleController = vehicle.NewTeslaControlController(&config.TeslaControl)
 	}
 
+	mr := metrics.NewMetricsRegistry()
+
 	c := controller.NewController(
 		inverter,
 		vehicleController,
 		config,
+		mr,
 	)
 
 	// TODO: Mode should be persisted between processes. New process should inherit the mode of the last running one.
