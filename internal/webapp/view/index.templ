@@ -33,8 +33,18 @@ templ Index(c *controller.Controller, m *metrics.Registry) {
 		<body hx-boost="true">
 			<h1>resistere</h1>
 
-			@ControllerModeSection(c)
-			@StatsSection(m)
+			<div>
+				<style>
+				me {
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+				}
+				</style>
+
+				@ControllerModeSection(c)
+				@StatsSection(m)
+			</div>
 		</body>
 	</html>
 }

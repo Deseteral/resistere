@@ -48,20 +48,33 @@ func StatsSection(m *metrics.Registry) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"></time></div><script>\n\t\t\t// TODO: Check if this interval will persist between state updates.\n\t\t\tsetInterval(() => {\n\t\t\t\tconst rtf = new Intl.RelativeTimeFormat(\"en\", { style: \"long\" });\n\n\t\t\t\tconst el = me(\"time\");\n\t\t\t\tconst time = new Date(el.getAttribute(\"datetime\"));\n\n\t\t\t\tconst diffInSeconds = -Math.floor((Date.now() - time) / 1000);\n\t\t\t\tel.innerHTML = rtf.format(diffInSeconds, \"second\");\n\t\t\t}, 500);\n\t\t</script><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"></time></div><script>\n\t\t\t// TODO: Check if this interval will persist between state updates.\n\t\t\tsetInterval(() => {\n\t\t\t\tconst rtf = new Intl.RelativeTimeFormat(\"en\", { style: \"long\" });\n\n\t\t\t\tconst el = me(\"time\");\n\t\t\t\tconst time = new Date(el.getAttribute(\"datetime\"));\n\n\t\t\t\tconst diffInSeconds = -Math.floor((Date.now() - time) / 1000);\n\t\t\t\tel.innerHTML = rtf.format(diffInSeconds, \"second\");\n\t\t\t}, 500);\n\t\t</script><div class=\"field-array\" style=\"width: 400px\"><div>Power production:</div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%f W", m.LatestFrame.PowerProductionWatts))
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts/1000.0))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/stats_section.templ`, Line: 27, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/stats_section.templ`, Line: 30, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " kW</div><div>Power consumption:</div><div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts/1000.0))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/stats_section.templ`, Line: 33, Col: 75}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " kW</div></div></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

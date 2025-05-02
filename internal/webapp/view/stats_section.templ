@@ -24,6 +24,13 @@ templ StatsSection(m *metrics.Registry) {
 			}, 500);
 		</script>
 
-		<div>{ fmt.Sprintf("%f W", m.LatestFrame.PowerProductionWatts) }</div>
+
+		<div class="field-array">
+			<div>Power production:</div>
+			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts / 1000.0) } kW</div>
+
+			<div>Power consumption:</div>
+			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
+		</div>
 	</fieldset>
 }
