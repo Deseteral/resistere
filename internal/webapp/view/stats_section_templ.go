@@ -48,7 +48,7 @@ func StatsSection(m *metrics.Registry) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"></time></div><script>\n\t\t\t// TODO: Check if this interval will persist between state updates.\n\t\t\tsetInterval(() => {\n\t\t\t\tconst rtf = new Intl.RelativeTimeFormat(\"en\", { style: \"long\" });\n\n\t\t\t\tconst el = me(\"time\");\n\t\t\t\tconst time = new Date(el.getAttribute(\"datetime\"));\n\n\t\t\t\tconst diffInSeconds = -Math.floor((Date.now() - time) / 1000);\n\t\t\t\tel.innerHTML = rtf.format(diffInSeconds, \"second\");\n\t\t\t}, 500);\n\t\t</script><div class=\"field-array\" style=\"width: 400px\"><div>Power production:</div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"></time></div><script>\n\t\t\t// TODO: Check if this interval will persist between state updates.\n\t\t\tsetInterval(() => {\n\t\t\t\tconst rtf = new Intl.RelativeTimeFormat(\"en\", { style: \"long\" });\n\n\t\t\t\tconst el = me(\"time\");\n\t\t\t\tconst time = new Date(el.getAttribute(\"datetime\"));\n\n\t\t\t\tconst diffInSeconds = -Math.floor((Date.now() - time) / 1000);\n\t\t\t\tel.innerHTML = rtf.format(diffInSeconds, \"second\");\n\t\t\t}, 500);\n\t\t</script><div class=\"field-array\"><div>Power production:</div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
