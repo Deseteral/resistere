@@ -1,15 +1,14 @@
 package view
 
 import (
-	"time"
 	"fmt"
 	"github.com/deseteral/resistere/internal/metrics"
+	"time"
 )
 
 templ StatsSection(m *metrics.Registry) {
 	<fieldset>
 		<legend>Statistics</legend>
-
 		<div>Last updated: <time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time></div>
 		<script>
 			// TODO: Check if this interval will persist between state updates.
@@ -23,12 +22,9 @@ templ StatsSection(m *metrics.Registry) {
 				el.innerHTML = rtf.format(diffInSeconds, "second");
 			}, 500);
 		</script>
-
-
 		<div class="field-array">
 			<div>Power production:</div>
 			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts / 1000.0) } kW</div>
-
 			<div>Power consumption:</div>
 			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
 		</div>
