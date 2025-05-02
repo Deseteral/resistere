@@ -94,6 +94,7 @@ func (c *Controller) tick() {
 
 	if selectedVehicle == nil {
 		log.Println("No vehicle is charging. Exiting controller tick.")
+		c.metricsRegistry.LatestFrame = metricsFrame
 		return
 	}
 

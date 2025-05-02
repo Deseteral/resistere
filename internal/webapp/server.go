@@ -11,13 +11,14 @@ import (
 	"github.com/a-h/templ"
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/webapp/view"
 )
 
 //go:embed static
 var staticFiles embed.FS
 
-func StartWebServerBlocking(config *configuration.Config, c *controller.Controller) error {
+func StartWebServerBlocking(config *configuration.Config, c *controller.Controller, m *metrics.Registry) error {
 	addr := fmt.Sprintf(":%v", config.Web.Port)
 
 	var staticFs = fs.FS(staticFiles)
@@ -29,7 +30,7 @@ func StartWebServerBlocking(config *configuration.Config, c *controller.Controll
 
 	router := http.NewServeMux()
 
-	router.Handle("GET /", templ.Handler(view.Index(c)))
+	router.Handle("GET /", templ.Handler(view.Index(c, m)))
 	router.HandleFunc("POST /controller/mode", postChangeControllerMode(c))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 

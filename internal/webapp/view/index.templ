@@ -2,9 +2,10 @@ package view
 
 import (
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/metrics"
 )
 
-templ Index(c *controller.Controller) {
+templ Index(c *controller.Controller, m *metrics.Registry) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -33,6 +34,7 @@ templ Index(c *controller.Controller) {
 			<h1>resistere</h1>
 
 			@ControllerModeSection(c)
+			@StatsSection(m)
 		</body>
 	</html>
 }

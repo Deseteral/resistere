@@ -1,0 +1,29 @@
+package view
+
+import (
+	"time"
+	"fmt"
+	"github.com/deseteral/resistere/internal/metrics"
+)
+
+templ StatsSection(m *metrics.Registry) {
+	<fieldset>
+		<legend>Statistics</legend>
+
+		<div>Last updated: <time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time></div>
+		<script>
+			// TODO: Check if this interval will persist between state updates.
+			setInterval(() => {
+				const rtf = new Intl.RelativeTimeFormat("en", { style: "long" });
+
+				const el = me("time");
+				const time = new Date(el.getAttribute("datetime"));
+
+				const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
+				el.innerHTML = rtf.format(diffInSeconds, "second");
+			}, 500);
+		</script>
+
+		<div>{ fmt.Sprintf("%f W", m.LatestFrame.PowerProductionWatts) }</div>
+	</fieldset>
+}

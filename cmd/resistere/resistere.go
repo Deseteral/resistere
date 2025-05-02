@@ -44,7 +44,7 @@ func startApplication() error {
 
 	c.StartBackgroundTask()
 
-	err = webapp.StartWebServerBlocking(config, &c)
+	err = webapp.StartWebServerBlocking(config, &c, mr)
 	if err != nil {
 		return err
 	}
