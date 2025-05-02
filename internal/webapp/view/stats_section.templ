@@ -28,5 +28,12 @@ templ StatsSection(m *metrics.Registry) {
 			<div>Power consumption:</div>
 			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
 		</div>
+		<div>
+			<ul>
+				for _, vehicleFrame := range m.LatestFrame.VehicleFrames {
+					<li>{ vehicleFrame.Name }: { fmt.Sprintf("%d", vehicleFrame.SetChargingAmps) }</li>
+				}
+			</ul>
+		</div>
 	</fieldset>
 }
