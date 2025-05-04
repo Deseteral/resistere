@@ -11,7 +11,7 @@ func (i *SimulatedInverter) ReadEnergySurplus() (InverterState, error) {
 
 func NewSimulatedInverter() *SimulatedInverter {
 	return &SimulatedInverter{
-		production:  11.0,
-		consumption: 4.0,
+		production:  11.0 * 1000.0,
+		consumption: 4.0 * 1000.0,
 	}
 }

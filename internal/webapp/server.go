@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/deseteral/resistere/internal/configuration"
@@ -32,6 +33,7 @@ func StartWebServerBlocking(config *configuration.Config, c *controller.Controll
 
 	router.Handle("GET /", templ.Handler(view.Index(c, m)))
 	router.HandleFunc("POST /controller/mode", postChangeControllerMode(c))
+	router.Handle("GET /metrics/prometheus", getPrometheus(m))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 
 	log.Printf("Web server starting on port %v.\n", config.Web.Port)
@@ -69,5 +71,16 @@ func postChangeControllerMode(c *controller.Controller) http.HandlerFunc {
 		c.ChangeMode(nextMode)
 
 		view.ControllerModeSection(c).Render(r.Context(), w)
+	}
+}
+
+func getPrometheus(m *metrics.Registry) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var sb strings.Builder
+
+		sb.WriteString(fmt.Sprintf("inverter_power_production_watts %f\n", m.LatestFrame.PowerProductionWatts))
+		sb.WriteString(fmt.Sprintf("inverter_power_consumption_watts %f\n", m.LatestFrame.PowerConsumptionWatts))
+
+		w.Write([]byte(sb.String()))
 	}
 }

@@ -28,12 +28,3 @@ func (v *VehicleFrame) IsCharging() bool {
 func NewMetricsRegistry() *Registry {
 	return &Registry{}
 }
-
-func NewVehicleMetricsFrame() VehicleFrame {
-	return VehicleFrame{
-		SetChargingAmps:    0,
-		ChargingPowerWatts: 0,
-		IsInRange:          false,
-		IsSelected:         false,
-	}
-}

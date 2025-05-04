@@ -3,12 +3,13 @@ package pv
 import (
 	"bytes"
 	"embed"
-	"github.com/deseteral/resistere/internal/configuration"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/deseteral/resistere/internal/configuration"
 )
 
 // TODO: Ideally this would not require using Python.
@@ -43,7 +44,7 @@ func (i *SolarmanInverter) ReadEnergySurplus() (InverterState, error) {
 		return InverterState{}, err
 	}
 
-	log.Printf("Read from Solarman inverter: production %fkW, consuption %fkW.\n", state.PowerProduction, state.PowerConsumption)
+	log.Printf("Read from Solarman inverter: production %.2f W, consuption %.2f W.\n", state.PowerProduction, state.PowerConsumption)
 
 	return state, nil
 }
@@ -118,7 +119,8 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (InverterStat
 		return InverterState{}, err
 	}
 
-	state := InverterState{PowerProduction: powerProduction, PowerConsumption: powerConsumption}
+	// Multiply by 1000 to convert from kilowatts to watts.
+	state := InverterState{PowerProduction: powerProduction * 1000.0, PowerConsumption: powerConsumption * 1000.0}
 	return state, nil
 }
 
