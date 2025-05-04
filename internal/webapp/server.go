@@ -14,10 +14,14 @@ import (
 	"github.com/deseteral/resistere/internal/controller"
 	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/webapp/view"
+	"github.com/invopop/ctxi18n"
 )
 
 //go:embed static
 var staticFiles embed.FS
+
+//go:embed locale
+var locale embed.FS
 
 func StartWebServerBlocking(config *configuration.Config, c *controller.Controller, m *metrics.Registry) error {
 	addr := fmt.Sprintf(":%v", config.Web.Port)
@@ -29,10 +33,16 @@ func StartWebServerBlocking(config *configuration.Config, c *controller.Controll
 		return err
 	}
 
+	err = ctxi18n.Load(locale)
+	if err != nil {
+		log.Printf("Error starting web server: %v.\n", err)
+		return err
+	}
+
 	router := http.NewServeMux()
 
-	router.Handle("GET /", templ.Handler(view.Index(c, m)))
-	router.HandleFunc("POST /controller/mode", postChangeControllerMode(c))
+	router.Handle("GET /", i18nMiddleware(templ.Handler(view.Index(c, m))))
+	router.Handle("POST /controller/mode", i18nMiddleware(postChangeControllerMode(c)))
 	router.Handle("GET /metrics/prometheus", getPrometheus(m))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 
@@ -45,6 +55,26 @@ func StartWebServerBlocking(config *configuration.Config, c *controller.Controll
 	}
 
 	return nil
+}
+
+func i18nMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		lang := "en"
+
+		acceptLang := r.Header.Get("Accept-Language")
+		if len(acceptLang) > 0 {
+			lang = acceptLang
+		}
+
+		ctx, err := ctxi18n.WithLocale(r.Context(), lang)
+		if err != nil {
+			log.Printf("Error setting locale: %v", err)
+			http.Error(w, "Error setting locale", http.StatusBadRequest)
+			return
+		}
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 func postChangeControllerMode(c *controller.Controller) http.HandlerFunc {

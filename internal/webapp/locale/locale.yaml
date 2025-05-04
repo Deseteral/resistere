@@ -1,0 +1,27 @@
+en:
+    mode:
+        tab_title: "Controller mode"
+        current_mode: "Current mode"
+        automatic: "automatic"
+        manual: "manual"
+        help_message_automatic: "Charging current is being automatically controlled to maximise the usage of power from PV. This will result in slower charging speeds."
+        help_message_manual: "Charging current is not being automatically controlled. You can set the current from inside the vehicle or via mobile app. This will result in higher usage of grid power."
+    statistics:
+        tab_title: "Statistics"
+        last_updated: "Last updated"
+        power_production: "Power production"
+        power_consumption: "Power consumption"
+
+pl:
+    mode:
+        tab_title: "Tryb kontrolera"
+        current_mode: "Aktywny tryb"
+        automatic: "automatyczny"
+        manual: "ręczny"
+        help_message_automatic: "Prąd ładowania jest ustawiany automatycznie, żeby jak najlepiej wykorzystać energię z PV. Będzie to skutkować wolniejszym ładowaniem."
+        help_message_manual: "Prąd ładowania nie jest automatycznie regulowany. Możesz zmienić jego wartość w aucie lub za pomocą aplikacji mobilnej. Będzie to skutkować większym zużyciem energii z sieci."
+    statistics:
+        tab_title: "Statystyki"
+        last_updated: "Ostatnia aktualizacja"
+        power_production: "Produkcja mocy"
+        power_consumption: "Konsumpcja mocy"

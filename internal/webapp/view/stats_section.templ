@@ -3,17 +3,27 @@ package view
 import (
 	"fmt"
 	"github.com/deseteral/resistere/internal/metrics"
+	"github.com/invopop/ctxi18n"
+	"github.com/invopop/ctxi18n/i18n"
 	"time"
 )
 
 templ StatsSection(m *metrics.Registry) {
 	<fieldset>
-		<legend>Statistics</legend>
-		<div>Last updated: <time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time></div>
+		<legend>{ i18n.T(ctx, "statistics.tab_title") }</legend>
+		<div>
+			<style>
+			me {
+				margin-bottom: 16px;
+			}
+			</style>
+			{ i18n.T(ctx, "statistics.last_updated") }:
+			<time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time>
+		</div>
 		<script>
 			// TODO: Check if this interval will persist between state updates.
 			setInterval(() => {
-				const rtf = new Intl.RelativeTimeFormat("en", { style: "long" });
+				const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
 
 				const el = me("time");
 				const time = new Date(el.getAttribute("datetime"));
@@ -23,17 +33,10 @@ templ StatsSection(m *metrics.Registry) {
 			}, 500);
 		</script>
 		<div class="field-array">
-			<div>Power production:</div>
+			<div>{ i18n.T(ctx, "statistics.power_production") }:</div>
 			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts / 1000.0) } kW</div>
-			<div>Power consumption:</div>
+			<div>{ i18n.T(ctx, "statistics.power_consumption") }:</div>
 			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
-		</div>
-		<div>
-			<ul>
-				for _, vehicleFrame := range m.LatestFrame.VehicleFrames {
-					<li>{ vehicleFrame.Name }: { fmt.Sprintf("%d", vehicleFrame.SetChargingAmps) }</li>
-				}
-			</ul>
 		</div>
 	</fieldset>
 }

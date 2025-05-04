@@ -1,14 +1,15 @@
 package view
 
 import (
+	"context"
 	"fmt"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/invopop/ctxi18n/i18n"
 )
 
 templ ControllerModeSection(c *controller.Controller) {
 	<fieldset id="controller-mode-section">
-		<legend>Controller mode</legend>
-
+		<legend>{ i18n.T(ctx, "mode.tab_title") }</legend>
 		<div
 			hx-target="#controller-mode-section"
 			hx-swap="outerHTML"
@@ -23,30 +24,28 @@ templ ControllerModeSection(c *controller.Controller) {
 				}
 			}
 			</style>
-
 			<button
 				hx-post={ getUrlForModeButton(controller.ModePVAutomatic) }
 				disabled?={ isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) }
 			>
 				<i class="ph-bold ph-sun"></i>
-				Automatic
+				{ getModeName(ctx, controller.ModePVAutomatic) }
 			</button>
 			<button
 				hx-post={ getUrlForModeButton(controller.ModeManual) }
 				disabled?={ isModeButtonDisabled(controller.ModeManual, c.Mode) }
 			>
 				<i class="ph-bold ph-hand-tap"></i>
-				Manual
+				{ getModeName(ctx, controller.ModeManual) }
 			</button>
 		</div>
-
 		<div>
 			<style>
 			me {
 				margin-top: 8px;
 			}
 			</style>
-			Current mode: <strong>{ getModeName(c.Mode) }</strong>
+			{ i18n.T(ctx, "mode.current_mode") }: <strong>{ getModeName(ctx, c.Mode) }</strong>
 			<p>
 				<style>
 				me {
@@ -62,9 +61,8 @@ templ ControllerModeSection(c *controller.Controller) {
 					}
 				}
 				</style>
-
 				<i class="ph-bold ph-info"></i>
-				{ getHelpMessageForMode(c.Mode) }
+				{ getHelpMessageForMode(ctx, c.Mode) }
 			</p>
 		</div>
 	</fieldset>
@@ -78,20 +76,19 @@ func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mod
 	return buttonMode == currentMode
 }
 
-// TODO: This should be handled by i18n mechanism.
-func getModeName(mode controller.Mode) string {
+func getModeName(ctx context.Context, mode controller.Mode) string {
 	if mode == controller.ModePVAutomatic {
-		return "Automatic"
+		return i18n.T(ctx, "mode.automatic")
 	} else {
-		return "Manual"
+		return i18n.T(ctx, "mode.manual")
 	}
 }
 
 // TODO: This should be handled by i18n mechanism.
-func getHelpMessageForMode(mode controller.Mode) string {
+func getHelpMessageForMode(ctx context.Context, mode controller.Mode) string {
 	if mode == controller.ModePVAutomatic {
-		return "Charging current is being controlled to maximise the production from PV. This will result in slower charging speeds."
+		return i18n.T(ctx, "mode.help_message_automatic")
 	} else {
-		return "Charging current is not being set automatically. You can change the current from inside the vehicle or via mobile app. This may result in faster charging speeds but may lead to higher usage of grid power."
+		return i18n.T(ctx, "mode.help_message_manual")
 	}
 }

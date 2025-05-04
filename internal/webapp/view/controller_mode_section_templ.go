@@ -9,8 +9,10 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"context"
 	"fmt"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/invopop/ctxi18n/i18n"
 )
 
 func ControllerModeSection(c *controller.Controller) templ.Component {
@@ -34,79 +36,131 @@ func ControllerModeSection(c *controller.Controller) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset id=\"controller-mode-section\"><legend>Controller mode</legend><div hx-target=\"#controller-mode-section\" hx-swap=\"outerHTML\"><style>\n\t\t\tme {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\n\t\t\t\tbutton {\n\t\t\t\t\twidth: 130px;\n\t\t\t\t}\n\t\t\t}\n\t\t\t</style><button hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset id=\"controller-mode-section\"><legend>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModePVAutomatic))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "mode.tab_title"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 28, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 12, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " disabled")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "><i class=\"ph-bold ph-sun\"></i> Automatic</button> <button hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</legend><div hx-target=\"#controller-mode-section\" hx-swap=\"outerHTML\"><style>\n\t\t\tme {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\n\t\t\t\tbutton {\n\t\t\t\t\twidth: 130px;\n\t\t\t\t}\n\t\t\t}\n\t\t\t</style><button hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModeManual))
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModePVAutomatic))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 35, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 28, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if isModeButtonDisabled(controller.ModeManual, c.Mode) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " disabled")
+		if isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " disabled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "><i class=\"ph-bold ph-hand-tap\"></i> Manual</button></div><div><style>\n\t\t\tme {\n\t\t\t\tmargin-top: 8px;\n\t\t\t}\n\t\t\t</style>Current mode: <strong>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "><i class=\"ph-bold ph-sun\"></i> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(getModeName(c.Mode))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(getModeName(ctx, controller.ModePVAutomatic))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 49, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 32, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</strong><p><style>\n\t\t\t\tme {\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tfont-style: italic;\n\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: row;\n\t\t\t\t\talign-items: center;\n\n\t\t\t\t\ti {\n\t\t\t\t\t\tmargin-right: 4px;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t</style><i class=\"ph-bold ph-info\"></i> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</button> <button hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getHelpMessageForMode(c.Mode))
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getUrlForModeButton(controller.ModeManual))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 67, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 35, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p></div></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isModeButtonDisabled(controller.ModeManual, c.Mode) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " disabled")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "><i class=\"ph-bold ph-hand-tap\"></i> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(getModeName(ctx, controller.ModeManual))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 39, Col: 45}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</button></div><div><style>\n\t\t\tme {\n\t\t\t\tmargin-top: 8px;\n\t\t\t}\n\t\t\t</style>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "mode.current_mode"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 48, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ": <strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(getModeName(ctx, c.Mode))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 48, Col: 75}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</strong><p><style>\n\t\t\t\tme {\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tfont-style: italic;\n\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: row;\n\t\t\t\t\talign-items: center;\n\n\t\t\t\t\ti {\n\t\t\t\t\t\tmargin-right: 4px;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t</style><i class=\"ph-bold ph-info\"></i> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getHelpMessageForMode(ctx, c.Mode))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/webapp/view/controller_mode_section.templ`, Line: 65, Col: 40}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p></div></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,21 +176,20 @@ func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mod
 	return buttonMode == currentMode
 }
 
-// TODO: This should be handled by i18n mechanism.
-func getModeName(mode controller.Mode) string {
+func getModeName(ctx context.Context, mode controller.Mode) string {
 	if mode == controller.ModePVAutomatic {
-		return "Automatic"
+		return i18n.T(ctx, "mode.automatic")
 	} else {
-		return "Manual"
+		return i18n.T(ctx, "mode.manual")
 	}
 }
 
 // TODO: This should be handled by i18n mechanism.
-func getHelpMessageForMode(mode controller.Mode) string {
+func getHelpMessageForMode(ctx context.Context, mode controller.Mode) string {
 	if mode == controller.ModePVAutomatic {
-		return "Charging current is being controlled to maximise the production from PV. This will result in slower charging speeds."
+		return i18n.T(ctx, "mode.help_message_automatic")
 	} else {
-		return "Charging current is not being set automatically. You can change the current from inside the vehicle or via mobile app. This may result in faster charging speeds but may lead to higher usage of grid power."
+		return i18n.T(ctx, "mode.help_message_manual")
 	}
 }
 
