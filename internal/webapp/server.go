@@ -42,6 +42,7 @@ func StartWebServerBlocking(config *configuration.Config, c *controller.Controll
 	router := http.NewServeMux()
 
 	router.Handle("GET /", i18nMiddleware(templ.Handler(view.Index(c, m))))
+	router.Handle("GET /view/stats", i18nMiddleware(templ.Handler(view.StatsSection(m))))
 	router.Handle("POST /controller/mode", i18nMiddleware(postChangeControllerMode(c)))
 	router.Handle("GET /metrics/prometheus", getPrometheus(m))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))

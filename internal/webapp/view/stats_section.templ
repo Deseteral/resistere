@@ -9,14 +9,19 @@ import (
 )
 
 templ StatsSection(m *metrics.Registry) {
-	<fieldset>
+	<fieldset
+		id="stats-section"
+		hx-get="/view/stats"
+		hx-trigger="load delay:5s"
+		hx-swap-oob="true"
+	>
 		<legend>{ i18n.T(ctx, "statistics.tab_title") }</legend>
 		<div>
 			<style>
-			me {
-				display: flex;
-				flex-direction: column;
-			}
+				me {
+					display: flex;
+					flex-direction: column;
+				}
 			</style>
 			<div class="field-array">
 				<div>{ i18n.T(ctx, "statistics.power_production") }:</div>
@@ -26,37 +31,45 @@ templ StatsSection(m *metrics.Registry) {
 			</div>
 			<div>
 				<style>
-			me {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				align-self: flex-end;
+					me {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						align-self: flex-end;
 
-				margin-top: 8px;
+						margin-top: 8px;
 
-				font-size: 13px;
-				font-variant-numeric: tabular-nums;
+						font-size: 13px;
+						font-variant-numeric: tabular-nums;
 
-				i {
-					margin-right: 4px;
-				}
-			}
-			</style>
+						i {
+							margin-right: 4px;
+						}
+					}
+				</style>
 				<i class="ph-bold ph-arrows-clockwise"></i>
 				{ i18n.T(ctx, "statistics.last_updated") }:&nbsp;
 				<time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time>
 				<script>
-					// TODO: Check if this interval will persist between state updates.
-					setInterval(() => {
+					(function() {
 						const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
 
 						const el = me("time");
 						const time = new Date(el.getAttribute("datetime"));
 
-						const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
-						el.innerHTML = rtf.format(diffInSeconds, "second");
-					}, 500);
-			</script>
+						function updateTimer() {
+							const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
+							el.innerHTML = rtf.format(diffInSeconds, "second");
+						}
+
+						if (window.statsTimerIntervalId) {
+							clearInterval(window.statsTimerIntervalId);
+						}
+
+						updateTimer();
+						window.statsTimerIntervalId = setInterval(updateTimer, 500);
+					})();
+				</script>
 			</div>
 		</div>
 	</fieldset>
