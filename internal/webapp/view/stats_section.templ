@@ -14,29 +14,50 @@ templ StatsSection(m *metrics.Registry) {
 		<div>
 			<style>
 			me {
-				margin-bottom: 16px;
+				display: flex;
+				flex-direction: column;
 			}
 			</style>
-			{ i18n.T(ctx, "statistics.last_updated") }:
-			<time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time>
-		</div>
-		<script>
-			// TODO: Check if this interval will persist between state updates.
-			setInterval(() => {
-				const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
+			<div class="field-array">
+				<div>{ i18n.T(ctx, "statistics.power_production") }:</div>
+				<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts / 1000.0) } kW</div>
+				<div>{ i18n.T(ctx, "statistics.power_consumption") }:</div>
+				<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
+			</div>
+			<div>
+				<style>
+			me {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				align-self: flex-end;
 
-				const el = me("time");
-				const time = new Date(el.getAttribute("datetime"));
+				margin-top: 8px;
 
-				const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
-				el.innerHTML = rtf.format(diffInSeconds, "second");
-			}, 500);
-		</script>
-		<div class="field-array">
-			<div>{ i18n.T(ctx, "statistics.power_production") }:</div>
-			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerProductionWatts / 1000.0) } kW</div>
-			<div>{ i18n.T(ctx, "statistics.power_consumption") }:</div>
-			<div>{ fmt.Sprintf("%.2f", m.LatestFrame.PowerConsumptionWatts / 1000.0) } kW</div>
+				font-size: 13px;
+				font-variant-numeric: tabular-nums;
+
+				i {
+					margin-right: 4px;
+				}
+			}
+			</style>
+				<i class="ph-bold ph-arrows-clockwise"></i>
+				{ i18n.T(ctx, "statistics.last_updated") }:&nbsp;
+				<time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time>
+				<script>
+				// TODO: Check if this interval will persist between state updates.
+				setInterval(() => {
+					const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
+
+					const el = me("time");
+					const time = new Date(el.getAttribute("datetime"));
+
+					const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
+					el.innerHTML = rtf.format(diffInSeconds, "second");
+				}, 500);
+			</script>
+			</div>
 		</div>
 	</fieldset>
 }

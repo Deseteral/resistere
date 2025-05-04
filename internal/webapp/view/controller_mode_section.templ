@@ -10,6 +10,9 @@ import (
 templ ControllerModeSection(c *controller.Controller) {
 	<fieldset id="controller-mode-section">
 		<legend>{ i18n.T(ctx, "mode.tab_title") }</legend>
+		<div>
+			{ i18n.T(ctx, "mode.current_mode") }: <strong>{ getModeName(ctx, c.Mode) }</strong>
+		</div>
 		<div
 			hx-target="#controller-mode-section"
 			hx-swap="outerHTML"
@@ -41,13 +44,6 @@ templ ControllerModeSection(c *controller.Controller) {
 		</div>
 		<div>
 			<style>
-			me {
-				margin-top: 8px;
-			}
-			</style>
-			{ i18n.T(ctx, "mode.current_mode") }: <strong>{ getModeName(ctx, c.Mode) }</strong>
-			<p>
-				<style>
 				me {
 					font-size: 13px;
 					font-style: italic;
@@ -56,14 +52,15 @@ templ ControllerModeSection(c *controller.Controller) {
 					flex-direction: row;
 					align-items: center;
 
+					margin-top: 16px;
+
 					i {
 						margin-right: 4px;
 					}
 				}
 				</style>
-				<i class="ph-bold ph-info"></i>
-				{ getHelpMessageForMode(ctx, c.Mode) }
-			</p>
+			<i class="ph-bold ph-info"></i>
+			{ getHelpMessageForMode(ctx, c.Mode) }
 		</div>
 	</fieldset>
 }
