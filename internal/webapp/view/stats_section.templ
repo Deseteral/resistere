@@ -46,16 +46,16 @@ templ StatsSection(m *metrics.Registry) {
 				{ i18n.T(ctx, "statistics.last_updated") }:&nbsp;
 				<time datetime={ m.LatestFrame.Timestamp.Format(time.RFC3339) }></time>
 				<script>
-				// TODO: Check if this interval will persist between state updates.
-				setInterval(() => {
-					const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
+					// TODO: Check if this interval will persist between state updates.
+					setInterval(() => {
+						const rtf = new Intl.RelativeTimeFormat({{ ctxi18n.Locale(ctx).Code().Base() }}, { style: "long" });
 
-					const el = me("time");
-					const time = new Date(el.getAttribute("datetime"));
+						const el = me("time");
+						const time = new Date(el.getAttribute("datetime"));
 
-					const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
-					el.innerHTML = rtf.format(diffInSeconds, "second");
-				}, 500);
+						const diffInSeconds = -Math.floor((Date.now() - time) / 1000);
+						el.innerHTML = rtf.format(diffInSeconds, "second");
+					}, 500);
 			</script>
 			</div>
 		</div>
