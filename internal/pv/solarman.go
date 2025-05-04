@@ -99,7 +99,7 @@ func (i *SolarmanInverter) execPythonBinary(binaryFilePath string) (InverterStat
 
 	err := cmd.Run()
 	if err != nil {
-		log.Printf("solarman_interface failed to produce expeted output: %v", err)
+		log.Printf("solarman_interface failed to produce expected output: %v", err)
 		return InverterState{}, err
 	}
 
