@@ -111,6 +111,11 @@ func getPrometheus(m *metrics.Registry) http.HandlerFunc {
 
 		sb.WriteString(fmt.Sprintf("inverter_power_production_watts %f\n", m.LatestFrame.PowerProductionWatts))
 		sb.WriteString(fmt.Sprintf("inverter_power_consumption_watts %f\n", m.LatestFrame.PowerConsumptionWatts))
+		sb.WriteString("\n")
+
+		for _, v := range m.LatestFrame.VehicleFrames {
+			sb.WriteString(fmt.Sprintf("vehicle_charging_power_watts{car=%q} %f\n", v.Name, v.ChargingPowerWatts))
+		}
 
 		w.Write([]byte(sb.String()))
 	}
