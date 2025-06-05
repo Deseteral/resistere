@@ -24,6 +24,7 @@ type Web struct {
 type Controller struct {
 	CycleIntervalSeconds int `toml:"cycle_interval_seconds"`
 	SafetyMarginWatts    int `toml:"safety_margin_watts"`
+	GridVoltage          int `toml:"grid_voltage"`
 }
 
 type SolarmanInverter struct {
