@@ -38,7 +38,6 @@ func startApplication() error {
 		mr,
 	)
 
-	// TODO: Mode should be persisted between processes. New process should inherit the mode of the last running one.
 	// TODO: This should be controlled by physical toggle switch.
 	c.ChangeMode(controller.ModePVAutomatic)
 

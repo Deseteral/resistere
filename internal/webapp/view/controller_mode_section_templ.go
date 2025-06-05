@@ -184,7 +184,6 @@ func getModeName(ctx context.Context, mode controller.Mode) string {
 	}
 }
 
-// TODO: This should be handled by i18n mechanism.
 func getHelpMessageForMode(ctx context.Context, mode controller.Mode) string {
 	if mode == controller.ModePVAutomatic {
 		return i18n.T(ctx, "mode.help_message_automatic")

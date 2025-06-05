@@ -27,10 +27,6 @@ type Controller struct {
 func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
-	// TODO: Perform first tick immediately, before entering ticker loop.
-	//       Make sure the http server is up, as this might block the thread.
-	// c.tick()
-
 	// TODO: Currently every tick starts at set interval. This is not correct behaviour.
 	//       What should actually happen is each new tick should start at X second interval after the previous one ended
 	//       and not when it started.
