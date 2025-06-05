@@ -5,7 +5,7 @@ type SimulatedInverter struct {
 	consumption float64
 }
 
-func (i *SimulatedInverter) ReadEnergySurplus() (InverterState, error) {
+func (i *SimulatedInverter) ReadInverterState() (InverterState, error) {
 	return InverterState{PowerProduction: i.production, PowerConsumption: i.consumption}, nil
 }
 

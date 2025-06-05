@@ -143,7 +143,7 @@ func (c *Controller) selectVehicleForProcessing(data *processingData) {
 
 func (c *Controller) calculateEnergySurplus(data *processingData) error {
 	// Get energy surplus from inverter.
-	inverterState, err := c.inverter.ReadEnergySurplus()
+	inverterState, err := c.inverter.ReadInverterState()
 	if err != nil {
 		return err
 	}

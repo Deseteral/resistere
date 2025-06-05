@@ -24,7 +24,7 @@ type SolarmanInverter struct {
 	port   string
 }
 
-func (i *SolarmanInverter) ReadEnergySurplus() (InverterState, error) {
+func (i *SolarmanInverter) ReadInverterState() (InverterState, error) {
 	// Extract Python binary to tmp location for running.
 	binaryFilePath, err := i.preparePythonBinary()
 	if err != nil {
