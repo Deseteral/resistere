@@ -1,9 +1,10 @@
 package configuration
 
 import (
-	"github.com/BurntSushi/toml"
 	"log"
 	"os"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
@@ -22,6 +23,7 @@ type Web struct {
 
 type Controller struct {
 	CycleIntervalSeconds int `toml:"cycle_interval_seconds"`
+	SafetyMarginWatts    int `toml:"safety_margin_watts"`
 }
 
 type SolarmanInverter struct {

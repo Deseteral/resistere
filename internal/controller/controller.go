@@ -22,6 +22,7 @@ type Controller struct {
 	vehicleController vehicle.Controller
 	evse              evse.Evse
 	metricsRegistry   *metrics.Registry
+	config            *configuration.Config
 }
 
 func (c *Controller) StartBackgroundTask() {
@@ -158,9 +159,8 @@ func (c *Controller) calculateEnergySurplus(data *processingData) error {
 }
 
 func (c *Controller) calculateNextAmpsToBeSet(data *processingData) {
-	// Add safety margin of 1kW to surplus, to ensure that we don't charge with energy from the grid.
-	// TODO: Safety margin should be configurable.
-	data.energySurplus -= 1000
+	// Add safety margin to surplus, to ensure that we don't charge with energy from the grid.
+	data.energySurplus -= float64(c.config.Controller.SafetyMarginWatts)
 
 	// Calculate by how much we should change the charging speed.
 	//   3 * V * A = W
@@ -224,5 +224,6 @@ func NewController(
 		inverter:          inverter,
 		vehicleController: vehicleController,
 		metricsRegistry:   metricsRegistry,
+		config:            config,
 	}
 }
