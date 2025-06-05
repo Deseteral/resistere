@@ -21,7 +21,7 @@ type TeslaControlController struct {
 	keyFilePath string
 }
 
-func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, error error) {
+func (c *TeslaControlController) GetChargingState(vehicle *Vehicle) (state *ChargingState, error error) {
 	cmd := exec.Command(
 		"tesla-control",
 		"-vin", vehicle.Vin,
@@ -41,7 +41,7 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 	err := cmd.Run()
 	if err != nil {
 		stderrContent := strings.TrimSuffix(errBuffer.String(), "\n")
-		return -1, errors.New(fmt.Sprintf("error while running tesla-control: %s", stderrContent))
+		return nil, errors.New(fmt.Sprintf("error while running tesla-control: %s", stderrContent))
 	}
 
 	output := outBuffer.String()
@@ -49,31 +49,40 @@ func (c *TeslaControlController) GetChargingAmps(vehicle *Vehicle) (amps int, er
 	var data map[string]any
 	err = json.Unmarshal([]byte(output), &data)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
 	chargeState, ok := data["chargeState"].(map[string]any)
 	if !ok {
-		return -1, errors.New("error parsing tesla-control state JSON: chargeState is undefined")
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState is undefined")
 	}
 
 	chargingState, ok := chargeState["chargingState"].(map[string]any)
 	if !ok {
-		return -1, errors.New("error parsing tesla-control state JSON: chargeState.chargingState is undefined")
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState.chargingState is undefined")
 	}
 
 	_, charging := chargingState["Charging"]
 	if !charging {
-		return -1, nil
+		return nil, nil
 	}
 
 	chargingAmpsRaw, ok := chargeState["chargingAmps"].(float64)
 	if !ok {
-		return -1, nil
+		return nil, nil
 	}
-	amps = int(chargingAmpsRaw)
 
-	return amps, nil
+	powerRaw, ok := chargeState["chargerPower"].(float64)
+	if !ok {
+		return nil, nil
+	}
+
+	s := ChargingState{
+		Amps:  int(chargingAmpsRaw),
+		Power: powerRaw,
+	}
+
+	return &s, nil
 }
 
 func (c *TeslaControlController) SetChargingAmps(vehicle *Vehicle, amps int) error {

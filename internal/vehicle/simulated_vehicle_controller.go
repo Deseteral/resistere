@@ -2,10 +2,11 @@ package vehicle
 
 type SimulatedVehicleController struct {
 	chargingAmps int
+	power        int
 }
 
-func (c *SimulatedVehicleController) GetChargingAmps(vehicle *Vehicle) (amps int, error error) {
-	return c.chargingAmps, nil
+func (c *SimulatedVehicleController) GetChargingState(vehicle *Vehicle) (state *ChargingState, error error) {
+	return &ChargingState{Amps: c.chargingAmps, Power: 5}, nil
 }
 
 func (c *SimulatedVehicleController) SetChargingAmps(vehicle *Vehicle, chargingAmps int) error {
@@ -16,5 +17,6 @@ func (c *SimulatedVehicleController) SetChargingAmps(vehicle *Vehicle, chargingA
 func NewSimulatedVehicleController() *SimulatedVehicleController {
 	return &SimulatedVehicleController{
 		chargingAmps: 8,
+		power:        5,
 	}
 }

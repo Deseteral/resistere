@@ -1,6 +1,11 @@
 package vehicle
 
 type Controller interface {
-	GetChargingAmps(vehicle *Vehicle) (amps int, error error)
+	GetChargingState(vehicle *Vehicle) (state *ChargingState, error error)
 	SetChargingAmps(vehicle *Vehicle, chargingAmps int) error
+}
+
+type ChargingState struct {
+	Amps  int
+	Power float64
 }

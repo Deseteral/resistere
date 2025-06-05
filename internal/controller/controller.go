@@ -117,7 +117,7 @@ func (c *Controller) selectVehicleForProcessing(data *processingData) {
 			Name: v.Name,
 		}
 
-		chargingAmps, err := c.vehicleController.GetChargingAmps(&v)
+		chargingState, err := c.vehicleController.GetChargingState(&v)
 
 		if err != nil {
 			log.Printf("Could not communicate with the car %s: %v.\n", v.Name, err)
@@ -129,11 +129,12 @@ func (c *Controller) selectVehicleForProcessing(data *processingData) {
 
 		vehicleMetricsFrame.IsInRange = true
 
-		if chargingAmps > 0 {
-			vehicleMetricsFrame.SetChargingAmps = chargingAmps
+		if chargingState.Amps > 0 {
+			vehicleMetricsFrame.SetChargingAmps = chargingState.Amps
+			vehicleMetricsFrame.ChargingPowerWatts = chargingState.Power * 1000.0
 
 			data.selectedVehicle = &v
-			data.selectedVehicleChargingAmps = chargingAmps
+			data.selectedVehicleChargingAmps = chargingState.Amps
 			data.selectedVehicleMetricsFrame = &vehicleMetricsFrame
 		} else {
 			log.Printf("Car %s is in-range but not charging.\n", v.Name)
