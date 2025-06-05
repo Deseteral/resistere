@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/deseteral/resistere/internal/configuration"
-	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/utils"
@@ -20,7 +19,6 @@ type Controller struct {
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
-	evse              evse.Evse
 	metricsRegistry   *metrics.Registry
 	config            *configuration.Config
 }
