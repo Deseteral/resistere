@@ -68,7 +68,9 @@ Where:
 - $V$ - the electric potential of the energy grid.
 - $3$ - represents that the EVSE (Electric Vehicle Supply Equipment) is using three-phases to charge.
 
-## ⚙️ Hardware
+## ⚡️ Deployment
+
+### Hardware
 
 I've done this project for myself and while it's fairly configurable, it does require specific hardware combinations to work:
 
@@ -78,7 +80,13 @@ I've done this project for myself and while it's fairly configurable, it does re
 
 Adding support for other inverters should be easy, provided you can connect to them and read or calculate energy surplus.
 
-## 📄 Configuration
+### Software
+
+- Download or build from source resistere binary for your architecture.
+- Make sure you're Linux enviroment has [`tesla-control`](https://github.com/teslamotors/vehicle-command/blob/main/cmd/tesla-control/README.md) and Python 3 installed and in path.
+- Prepare configuration file.
+
+### Configuration
 
 The application requires `config.toml` file to run. Here's example configuration:
 
@@ -106,6 +114,38 @@ cars = [
     { name = "My Model Y", vin = "ABCDEFGHIJ1234567" },
 ]
 ```
+
+## 👉 Web UI
+
+The application provides simple user interface to change the controller mode (automatic/manual).
+
+![Screenshot of user interface](resources/webui_screenshot.png)
+
+## 🚧 Development
+
+This project was built using Go 1.24.1. It uses [templ](https://templ.guide/) for web UI templating.
+
+The frontend is using [HTMX](https://htmx.org/), [Surreal](https://github.com/gnat/surreal), [css-scope-inline](https://github.com/gnat/css-scope-inline) and [Phosphor icons](https://phosphoricons.com/).
+
+To build it just execute:
+
+```sh
+make
+```
+
+When running debug build locally, you will want to put `simulator_mode = true` in `config.toml`.
+
+To build for Raspberry Pi (arm64) run:
+
+```sh
+make release_rpi
+```
+
+## Tesla pairing
+
+`resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses official Tesla's [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
+
+Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instruction on paring.
 
 ## 📜 License
 
