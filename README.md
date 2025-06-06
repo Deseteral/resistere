@@ -55,7 +55,7 @@ The core of processing logic is contained in `internal/controller.go` module. Th
 
 To calculate delta amps, controller has to calculate current power surplus (difference between power production and consumption) and read current charging amps from vehicle.
 
-It then calculates it using following formula:
+It then calculates it using the following formula:
 
 $$
 \Delta A = \frac{W}{V \cdot 3}
@@ -83,7 +83,7 @@ Adding support for other inverters should be easy, provided you can connect to t
 ### Software
 
 - Download or build from source resistere binary for your architecture.
-- Make sure you're Linux enviroment has [`tesla-control`](https://github.com/teslamotors/vehicle-command/blob/main/cmd/tesla-control/README.md) and Python 3 installed and in path.
+- Make sure your Linux environment has [`tesla-control`](https://github.com/teslamotors/vehicle-command/blob/main/cmd/tesla-control/README.md) and Python 3 installed and in path.
 - Prepare configuration file.
 
 ### Configuration
@@ -117,13 +117,13 @@ cars = [
 
 ### Tesla pairing
 
-`resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses official Tesla's [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
+`resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses Tesla's official [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
 
-Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instruction on paring.
+Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instructions on pairing.
 
 ## 👉 Web UI
 
-The application provides simple user interface to change the controller mode (automatic/manual).
+The application provides a simple user interface to change the controller mode (automatic/manual).
 
 ![Screenshot of user interface](resources/webui_screenshot.png)
 
