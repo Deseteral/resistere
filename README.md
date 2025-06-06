@@ -1,12 +1,12 @@
 # resistere
 
-This project provides a Raspberry Pi-based controller designed to dynamically adjust the charging current for Tesla vehicles.
+`resistere` is a solution for dynamic power management that adjusts charge rate of Tesla vehicles based on the PV production surplus.
 
-It aims to maximize the use of solar energy by ensuring the car charges only from PV production surplus.
+It aims to maximize the use of solar energy, while charging as fast as possible.
 
-## 🪫 Controller logic
+## 🔋 Controller logic
 
-Core of processing logic is contained in `internal/controller.go` module. Following diagram presents simplified cycle flow.
+Core of processing logic is contained in `internal/controller.go` module. Following diagram presents simplified cycle flow:
 
 ```
 ┌───────────────┐             ┌───────────────┐        ┌ ─ ─ ─ ─ ─ ─ ─ ┐      ┌───────────────┐
@@ -56,7 +56,9 @@ Core of processing logic is contained in `internal/controller.go` module. Follow
  ░░░░░░░░░░░░░░░░░             ░░░░░░░░░░░░░░░░░                               ░░░░░░░░░░░░░░░░░
 ```
 
-To calculate delta amps, controller has to calculate current power surplus (difference between power production and consumption) and read current charging amps from vehicle. Then calculates it using following formula:
+To calculate delta amps, controller has to calculate current power surplus (difference between power production and consumption) and read current charging amps from vehicle.
+
+It then calculates it using following formula:
 
 $$
 \Delta A = \frac{W}{V \cdot 3}
@@ -71,13 +73,13 @@ Where:
 
 ## ⚙️ Hardware
 
-I've made this for myself and while it's fairly configurable, it does require specific hardware combination to work:
+I've done this project for myself and while it's fairly configurable, it does require specific hardware combination to work:
 
-- Any Tesla vehicle that can be controlled via Bluetooth.
 - Sofar HYD 5-20KTL-3PH inverter with Wi-Fi data logger (but it should work with any inverter that outputs the Modbus data in similar way).
 - Linux-based device with Bluetooth Low Energy connectivity (like Raspberry Pi Zero 2 W).
+- Any Tesla vehicle that can be controlled via Bluetooth.
 
-Adding support for other inverters should be easy, provided you can connect to them and read current energy production and consumption.
+Adding support for other inverters should be easy, provided you can connect to them and read or calculate energy surplus.
 
 ## 📄 Configuration
 
