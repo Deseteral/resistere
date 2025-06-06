@@ -115,6 +115,12 @@ cars = [
 ]
 ```
 
+### Tesla pairing
+
+`resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses official Tesla's [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
+
+Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instruction on paring.
+
 ## 👉 Web UI
 
 The application provides simple user interface to change the controller mode (automatic/manual).
@@ -140,12 +146,6 @@ To build for Raspberry Pi (arm64) run:
 ```sh
 make release_rpi
 ```
-
-## Tesla pairing
-
-`resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses official Tesla's [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
-
-Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instruction on paring.
 
 ## 📜 License
 
