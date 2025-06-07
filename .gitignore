@@ -1,4 +1,5 @@
 .idea
+.ropeproject
 .DS_Store
 bin/
 internal/view/*.go
