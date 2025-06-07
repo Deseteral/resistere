@@ -68,7 +68,7 @@ Where:
 - $V$ - the electric potential of the energy grid.
 - $3$ - represents that the EVSE (Electric Vehicle Supply Equipment) is using three-phases to charge.
 
-## ⚡️ Deployment
+## 🚀 Deployment
 
 ### Hardware
 
@@ -121,7 +121,7 @@ cars = [
 
 Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instructions on pairing.
 
-## 👉 Web UI
+## 👆 Web UI
 
 The application provides a simple user interface to change the controller mode (automatic/manual).
 
@@ -146,6 +146,10 @@ To build for Raspberry Pi (arm64) run:
 ```sh
 make release_rpi
 ```
+
+## 📈 Metrics
+
+There are a couple of simple metrics in Prometheus notation available on `/metrics/prometheus`.
 
 ## 📜 License
 
