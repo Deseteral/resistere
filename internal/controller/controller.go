@@ -32,13 +32,13 @@ func (c *Controller) StartBackgroundTask() {
 		for {
 			select {
 			case <-ticker.C:
-				c.tick()
+				c.Tick()
 			}
 		}
 	}()
 }
 
-func (c *Controller) tick() {
+func (c *Controller) Tick() {
 	log.Println("Entering controller tick.")
 
 	// Setup metrics frame for current processing tick.
@@ -165,7 +165,7 @@ func NewController(
 
 	return Controller{
 		Vehicles: v,
-		Mode:     ModeManual,
+		Mode:     ModePVAutomatic,
 
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
