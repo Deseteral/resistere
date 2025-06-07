@@ -150,6 +150,12 @@ To build for Raspberry Pi (arm64) run:
 make release_rpi
 ```
 
+To run all tests execute:
+
+```sh
+go ./...
+```
+
 ## 📈 Metrics
 
 There are a couple of simple metrics in Prometheus notation available on `/metrics/prometheus`.
