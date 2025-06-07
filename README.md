@@ -142,9 +142,13 @@ To build it just execute:
 make
 ```
 
-When running debug build locally, you will want to put `simulator_mode = true` in `config.toml`.
+When running debug build locally, you will want to put `simulator_mode = true` in `config.toml` and run:
 
-To build for Raspberry Pi (arm64) run:
+```sh
+make build_and_run
+```
+
+To make release build for Raspberry Pi (arm64) run:
 
 ```sh
 make release_rpi

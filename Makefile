@@ -1,4 +1,4 @@
-all: solarman_interface_binary templ build run
+all: solarman_interface_binary templ build
 
 build:
 	@echo "Building application"
@@ -8,6 +8,8 @@ build:
 run:
 	@echo "Running application"
 	./bin/resistere
+
+build_and_run: build run
 
 templ:
 	@echo "Building templ components"
