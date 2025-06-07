@@ -6,7 +6,10 @@ It aims to maximize the use of solar energy, while charging as fast as possible.
 
 ## 🔋 Controller logic
 
-The core of processing logic is contained in `internal/controller.go` module. The following diagram presents simplified cycle flow:
+The core of processing logic is contained in `internal/controller.go` module. It runs the `tick` function at set interval.
+The entire flow of `tick` function is documented - reading it will give you full perspective on how the processing works.
+
+The following diagram presents simplified cycle flow:
 
 ```
 ┌───────────────┐             ┌───────────────┐        ┌ ─ ─ ─ ─ ─ ─ ─ ┐  ┌───────────────┐

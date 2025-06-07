@@ -15,16 +15,22 @@ type Frame struct {
 
 type VehicleFrame struct {
 	Name               string
-	SetChargingAmps    int
 	ChargingPowerWatts float64
-	IsInRange          bool
-	IsSelected         bool
-}
-
-func (v *VehicleFrame) IsCharging() bool {
-	return v.ChargingPowerWatts > 0
 }
 
 func NewMetricsRegistry() *Registry {
 	return &Registry{}
+}
+
+func NewMetricsFrame() Frame {
+	return Frame{
+		Timestamp: time.Now(),
+	}
+}
+
+func NewMetricsVehicleFrame(name string) VehicleFrame {
+	return VehicleFrame{
+		Name:               name,
+		ChargingPowerWatts: 0.0,
+	}
 }
