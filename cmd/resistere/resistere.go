@@ -38,7 +38,6 @@ func startApplication() error {
 		mr,
 	)
 
-	// TODO: This should be controlled by physical toggle switch.
 	c.ChangeMode(controller.ModePVAutomatic)
 
 	c.StartBackgroundTask()

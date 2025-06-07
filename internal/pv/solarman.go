@@ -12,9 +12,6 @@ import (
 	"github.com/deseteral/resistere/internal/configuration"
 )
 
-// TODO: Ideally this would not require using Python.
-//       This may or may not require rewriting significant portions of pysolarmanv5 library to Go lang.
-
 //go:embed solarman_interface/build/solarman_interface.pyz
 var solarmanInterfaceBinary embed.FS
 

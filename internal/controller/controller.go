@@ -26,9 +26,6 @@ type Controller struct {
 func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
-	// TODO: Currently every tick starts at set interval. This is not correct behaviour.
-	//       What should actually happen is each new tick should start at X second interval after the previous one ended
-	//       and not when it started.
 	//       If processing tick is longer then the interval, then the next tick will start immediately.
 	ticker := time.NewTicker(c.updateInterval)
 	go func() {
@@ -104,8 +101,6 @@ func (c *Controller) tick() {
 
 func (c *Controller) selectVehicleForProcessing(data *processingData) {
 	// Save which car is charging and what's its current set amps.
-
-	// TODO: Perhaps this could be running in parallel.
 
 	for _, v := range c.Vehicles {
 		vehicleMetricsFrame := metrics.VehicleFrame{
@@ -194,10 +189,6 @@ func (c *Controller) setChargingAmpsToSelectedVehicle(data *processingData) erro
 	return nil
 }
 
-// TODO: When set to manual it should return back to automatic after certain time (10 minutes?) of not charging.
-//
-// This is important as "automatic" is the default, and leaving the controller running in "manual"
-// could lead to accidental grid usage.
 func (c *Controller) ChangeMode(mode Mode) {
 	log.Printf("Setting controller mode to %v.\n", modeName[mode])
 	c.Mode = mode

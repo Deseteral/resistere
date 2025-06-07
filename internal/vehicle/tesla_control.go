@@ -12,11 +12,6 @@ import (
 	"github.com/deseteral/resistere/internal/configuration"
 )
 
-// TODO: This implementation is kind of stupid.
-//       Instead of invoking tesla-control, we could just integrate with vehicle-command library.
-//       This would be much simpler code to handle as it would not require parsing errors and responses from
-//       command line interface.
-
 type TeslaControlController struct {
 	keyFilePath string
 }
