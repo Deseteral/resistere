@@ -82,20 +82,35 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 		t.Run(fmt.Sprintf("For surplus %f W and %d A currently set should set next amps to %d A", tt.surplusPower, tt.currentAmps, tt.expectedSetAmps), func(t *testing.T) {
 			// given
 			inverter := &mockInverter{state: pv.InverterState{PowerProduction: tt.surplusPower, PowerConsumption: 0}}
+			chargingPower := int(float64(tt.currentAmps) * 230 * 3 / 1000)
 			vehicleCtrl := &mockVehicleController{
 				chargingStates: map[string]vehicle.ChargingState{
-					"VIN1": {Amps: tt.currentAmps, Power: float64(tt.currentAmps) * 230 * 3},
+					"VIN2": {Amps: tt.currentAmps, Power: chargingPower},
 				},
 			}
-			ctrl := NewController(inverter, vehicleCtrl, baseConfig(tt.safetyMargin), metrics.NewMetricsRegistry())
+			metrics := metrics.NewMetricsRegistry()
+			ctrl := NewController(inverter, vehicleCtrl, baseConfig(tt.safetyMargin), metrics)
 
 			// when
 			ctrl.Tick()
 
 			// then
-			got := vehicleCtrl.setAmpsCalls["VIN1"]
+			got := vehicleCtrl.setAmpsCalls["VIN2"]
 			if got != tt.expectedSetAmps {
 				t.Errorf("Expected SetChargingAmps to %d, got %d", tt.expectedSetAmps, got)
+			}
+			if vehicleCtrl.setAmpsCalls["VIN1"] != 0 {
+				t.Errorf("Not charging vehicle should not be having amps set")
+			}
+
+			// and
+			metric := metrics.LatestFrame.VehicleFrames[0].ChargingPowerWatts
+			expectedMetric := float64(chargingPower * 1000.0)
+			if metric != expectedMetric {
+				t.Errorf("Expected charging power in metrics to be %f, got %f", expectedMetric, metric)
+			}
+			if len(metrics.LatestFrame.VehicleFrames) != 1 {
+				t.Errorf("Only charging vehicles should be included in metrics")
 			}
 		})
 	}

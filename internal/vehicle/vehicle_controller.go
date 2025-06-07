@@ -7,5 +7,5 @@ type Controller interface {
 
 type ChargingState struct {
 	Amps  int
-	Power float64
+	Power int
 }

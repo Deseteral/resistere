@@ -88,7 +88,7 @@ func (c *Controller) Tick() {
 			selectedVehicle = &v
 			selectedVehicleChargingAmps = chargingState.Amps
 
-			vehicleMetricsFrame.ChargingPowerWatts = chargingState.Power * 1000.0
+			vehicleMetricsFrame.ChargingPowerWatts = float64(chargingState.Power * 1000.0)
 		} else {
 			log.Printf("Car %s is in-range but not charging.\n", v.Name)
 		}
