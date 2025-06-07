@@ -139,7 +139,7 @@
       "frame_anchor_ref" : "E378B194-B28A-4ECC-8501-C6EF33669932",
       "frame_size" : "28,2",
       "model_text" : "81B122B0-06B8-4B52-868A-52196F2802EC",
-      "name" : "Get current power production and…",
+      "name" : "Get current power\nproduction and…",
       "object_id" : "0C898B8B-93C1-4F62-8F82-F2B9810EB48D",
       "origin" : "-33,-20",
       "position_refs" : [
@@ -1203,7 +1203,7 @@
     {
       "doc_ref" : "BDEB4EF8-4905-4834-8F28-4AFEC5CB7638",
       "object_id" : "81B122B0-06B8-4B52-868A-52196F2802EC",
-      "text" : "Get current power production and consumption",
+      "text" : "Get current power\nproduction and consumption",
       "type_id" : 27
     },
     {
