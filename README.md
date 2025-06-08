@@ -85,7 +85,7 @@ Adding support for other inverters should be easy, provided you can connect to t
 
 ### Software
 
-- Download or build from source resistere binary for your architecture.
+- Download or build from source `resistere` binary for your architecture.
 - Make sure your Linux environment has [`tesla-control`](https://github.com/teslamotors/vehicle-command/blob/main/cmd/tesla-control/README.md) and Python 3 installed and in path.
 - Prepare configuration file.
 
@@ -100,10 +100,10 @@ port = 5467 # Port on which the web UI will be running.
 [controller]
 cycle_interval_seconds = 10 # Time between charging current modulation (in seconds).
 safety_margin_watts = 1000  # Surplus power safety margin (in watts).
-grid_voltage = 230          # Grid voltage in your country/area.
+grid_voltage = 230          # Grid voltage in your country/area (in volts).
 
 [solarman_inverter]
-ip = "192.168.1.99"   # IP address of inverter's data logger in your local network.
+ip = "192.168.1.99"   # IP address of inverter's data logger on your local network.
 serial = "1234567890" # Serial number of inverter's data logger.
 port = "8899"         # Port of inverter's data logger.
 
@@ -148,7 +148,7 @@ When running debug build locally, you will want to put `simulator_mode = true` i
 make build_and_run
 ```
 
-To make release build for Raspberry Pi (arm64) run:
+To make release build for Raspberry Pi (arm64-linux) run:
 
 ```sh
 make release_rpi
@@ -157,7 +157,7 @@ make release_rpi
 To run all tests execute:
 
 ```sh
-go ./...
+go test ./...
 ```
 
 ## 📈 Metrics
