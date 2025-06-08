@@ -33,3 +33,6 @@ release_rpi: templ solarman_interface_binary
 	@echo "Copy scripts"
 	cp ./scripts/* ./bin/release/
 	@echo ""
+
+	@echo "Make zip bundle"
+	zip -vrj ./bin/resistere-arm64-linux.zip ./bin/release/ -X
