@@ -77,7 +77,7 @@ func (c *Controller) Tick() {
 
 		chargingState, err := c.vehicleController.GetChargingState(&v)
 		if err != nil {
-			log.Printf("Could not communicate with the car %s: %v.\n", v.Name, err)
+			log.Printf("Could not communicate with car %s: %v.\n", v.Name, err)
 
 			// Don't break the loop here.
 			// This car is probably just out of range. We should process next configured car.

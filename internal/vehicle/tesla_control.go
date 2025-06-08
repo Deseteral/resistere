@@ -49,12 +49,12 @@ func (c *TeslaControlController) GetChargingState(vehicle *Vehicle) (state *Char
 
 	chargeState, ok := data["chargeState"].(map[string]any)
 	if !ok {
-		return nil, errors.New("error parsing tesla-control state JSON: chargeState is undefined")
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState")
 	}
 
 	chargingState, ok := chargeState["chargingState"].(map[string]any)
 	if !ok {
-		return nil, errors.New("error parsing tesla-control state JSON: chargeState.chargingState is undefined")
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState.chargingState")
 	}
 
 	_, charging := chargingState["Charging"]
@@ -64,17 +64,17 @@ func (c *TeslaControlController) GetChargingState(vehicle *Vehicle) (state *Char
 
 	chargingAmpsRaw, ok := chargeState["chargingAmps"].(float64)
 	if !ok {
-		return nil, nil
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState.chargingAmps")
 	}
 
-	powerRaw, ok := chargeState["chargerPower"].(int)
+	powerRaw, ok := chargeState["chargerPower"].(float64)
 	if !ok {
-		return nil, nil
+		return nil, errors.New("error parsing tesla-control state JSON: chargeState.chargerPower")
 	}
 
 	s := ChargingState{
 		Amps:  int(chargingAmpsRaw),
-		Power: powerRaw,
+		Power: int(powerRaw),
 	}
 
 	return &s, nil
