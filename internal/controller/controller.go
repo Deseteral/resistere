@@ -76,11 +76,19 @@ func (c *Controller) Tick() {
 		vehicleMetricsFrame := metrics.NewMetricsVehicleFrame(v.Name)
 
 		chargingState, err := c.vehicleController.GetChargingState(&v)
+
 		if err != nil {
 			log.Printf("Could not communicate with car %s: %v.\n", v.Name, err)
 
 			// Don't break the loop here.
 			// This car is probably just out of range. We should process next configured car.
+			continue
+		}
+
+		if chargingState == nil {
+			log.Printf("Car %s is in range but does not seem to be charging.\n", v.Name)
+
+			// Don't break the loop here - move on to the next configured car.
 			continue
 		}
 
