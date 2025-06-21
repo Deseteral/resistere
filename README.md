@@ -164,6 +164,8 @@ go test ./...
 
 There are a couple of simple metrics in Prometheus notation available on `/metrics/prometheus`.
 
+You can find simple, premade, ready to import [Grafana dashboard here](resources/grafana_dashboard.json).
+
 ## 📜 License
 
 This project is licensed under the [MIT license](LICENSE).
