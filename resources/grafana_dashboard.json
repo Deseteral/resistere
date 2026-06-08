@@ -79,7 +79,32 @@
           },
           "unit": "watt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Vehicle \"Płotka\""
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 14,
@@ -539,11 +564,11 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
+        "w": 3,
         "x": 11,
         "y": 18
       },
-      "id": 8,
+      "id": 9,
       "options": {
         "minVizHeight": 75,
         "minVizWidth": 75,
@@ -562,16 +587,12 @@
       "pluginVersion": "12.0.1",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "cenvr0cruu22oc"
-          },
           "editorMode": "code",
-          "expr": "(avg_over_time(inverter_power_production_watts[$__range]) * $__range_s) / 3600",
+          "expr": "(\n  avg_over_time(\n    clamp_min(inverter_power_consumption_watts - inverter_power_production_watts, 0)[$__range:]\n  ) * $__range_s\n) / 3600",
           "hide": true,
-          "legendFormat": "Total energy produced",
+          "legendFormat": "Energy imported from grid",
           "range": true,
-          "refId": "D"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -591,9 +612,9 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$D/$C",
+          "expression": "($C-$A)/$C",
           "hide": false,
-          "refId": "A",
+          "refId": "B",
           "type": "math"
         }
       ],
@@ -609,12 +630,12 @@
     "list": []
   },
   "time": {
-    "from": "2026-03-07T08:19:54.455Z",
-    "to": "2026-03-07T16:30:12.804Z"
+    "from": "now-24h",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "resistere metrics",
   "uid": "721fcd1d-d300-4e1e-bffd-1abf03434c82",
-  "version": 31
+  "version": 32
 }
