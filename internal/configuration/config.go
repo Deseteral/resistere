@@ -8,12 +8,13 @@ import (
 )
 
 type Config struct {
-	SimulatorMode    bool `toml:"simulator_mode"`
-	Web              Web
-	Controller       Controller
-	SolarmanInverter SolarmanInverter `toml:"solarman_inverter"`
-	TeslaControl     TeslaControl     `toml:"tesla_control"`
-	Vehicles         Vehicles
+	SimulatorMode      bool `toml:"simulator_mode"`
+	Web                Web
+	Controller         Controller
+	SolarmanInverter   SolarmanInverter `toml:"solarman_inverter"`
+	TeslaControl       TeslaControl     `toml:"tesla_control"`
+	Vehicles           Vehicles
+	TeslaWallConnector TeslaWallConnector `toml:"tesla_wall_connector"`
 }
 
 type Web struct {
@@ -34,6 +35,10 @@ type SolarmanInverter struct {
 
 type TeslaControl struct {
 	KeyFile string `toml:"key_file"`
+}
+
+type TeslaWallConnector struct {
+	Ip string
 }
 
 type Vehicles struct {
