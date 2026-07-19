@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/deseteral/resistere/internal/configuration"
+	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/utils"
@@ -19,6 +20,7 @@ type Controller struct {
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
+	evse              evse.Evse
 	metricsRegistry   *metrics.Registry
 	config            *configuration.Config
 }
@@ -65,6 +67,18 @@ func (c *Controller) Tick() {
 	if c.Mode == ModeManual {
 		log.Println("Exiting controller tick because it's in manual mode.")
 		return
+	}
+
+	isVehicleConnected, evseErr := c.evse.IsVehicleConnected()
+	if evseErr != nil {
+		log.Printf("Could not communicate with EVSE: %v.\n", evseErr)
+		return
+	}
+	if !isVehicleConnected {
+		log.Println("No vehicle is connected to EVSE. Skipping tick.")
+		return
+	} else {
+		log.Println("Vehicle is connected to EVSE.")
 	}
 
 	// Check for all known vehicles and see which one (if any) is charging.
@@ -163,6 +177,7 @@ func (c *Controller) ChangeMode(mode Mode) {
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
+	evse evse.Evse,
 	config *configuration.Config,
 	metricsRegistry *metrics.Registry,
 ) Controller {
@@ -178,6 +193,7 @@ func NewController(
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
+		evse:              evse,
 		metricsRegistry:   metricsRegistry,
 		config:            config,
 	}

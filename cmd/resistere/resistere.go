@@ -5,6 +5,7 @@ import (
 
 	"github.com/deseteral/resistere/internal/configuration"
 	"github.com/deseteral/resistere/internal/controller"
+	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/vehicle"
@@ -17,23 +18,27 @@ func startApplication() error {
 		return err
 	}
 
-	var inverter pv.Inverter
-	var vehicleController vehicle.Controller
+	var inverterImpl pv.Inverter
+	var vehicleControllerImpl vehicle.Controller
+	var evseImpl evse.Evse
 
 	if config.SimulatorMode {
 		log.Println("Running in simulator mode.")
-		inverter = pv.NewSimulatedInverter()
-		vehicleController = vehicle.NewSimulatedVehicleController()
+		inverterImpl = pv.NewSimulatedInverter()
+		vehicleControllerImpl = vehicle.NewSimulatedVehicleController()
+		evseImpl = evse.NewSimulatedEvse()
 	} else {
-		inverter = pv.NewSolarmanInverter(&config.SolarmanInverter)
-		vehicleController = vehicle.NewTeslaControlController(&config.TeslaControl)
+		inverterImpl = pv.NewSolarmanInverter(&config.SolarmanInverter)
+		vehicleControllerImpl = vehicle.NewTeslaControlController(&config.TeslaControl)
+		evseImpl = evse.NewTeslaWallConnector(&config.TeslaWallConnector)
 	}
 
 	mr := metrics.NewMetricsRegistry()
 
 	c := controller.NewController(
-		inverter,
-		vehicleController,
+		inverterImpl,
+		vehicleControllerImpl,
+		evseImpl,
 		config,
 		mr,
 	)
