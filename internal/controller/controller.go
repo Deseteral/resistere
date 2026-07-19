@@ -85,8 +85,9 @@ func (c *Controller) Tick() {
 	// Save which car is charging and what's its current set amps.
 	var selectedVehicle *vehicle.Vehicle
 	var selectedVehicleChargingAmps int
+	selectedVehicleIndex := -1
 
-	for _, v := range c.Vehicles {
+	for vehicleIdx, v := range c.Vehicles {
 		vehicleMetricsFrame := metrics.NewMetricsVehicleFrame(v.Name)
 
 		chargingState, err := c.vehicleController.GetChargingState(&v)
@@ -109,6 +110,7 @@ func (c *Controller) Tick() {
 		if chargingState.Amps > 0 {
 			selectedVehicle = &v
 			selectedVehicleChargingAmps = chargingState.Amps
+			selectedVehicleIndex = vehicleIdx
 
 			vehicleMetricsFrame.ChargingPowerWatts = float64(chargingState.Power * 1000.0)
 		} else {
@@ -125,6 +127,14 @@ func (c *Controller) Tick() {
 		return
 	}
 	log.Printf("Selected vehicle %s with %dA set.\n", selectedVehicle.Name, selectedVehicleChargingAmps)
+
+	// Move the selected vehicle to the front of the list, so that on the next tick it is checked first.
+	// This will prevent waking up car that is probably not charging and does not need waking up.
+	if selectedVehicleIndex > 0 {
+		sv := c.Vehicles[selectedVehicleIndex]
+		copy(c.Vehicles[1:selectedVehicleIndex+1], c.Vehicles[:selectedVehicleIndex])
+		c.Vehicles[0] = sv
+	}
 
 	// If controller could not get energy surplus data from intverter it should stop further processing.
 	if inverterStateErr != nil {

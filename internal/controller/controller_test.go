@@ -175,6 +175,36 @@ func Test_EVSE_NoVehicleConnected(t *testing.T) {
 	}
 }
 
+func Test_VehicleOrderPersistsBetweenTicks(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{
+		chargingStates: map[string]vehicle.ChargingState{
+			"VIN3": {Amps: 8, Power: 5},
+		},
+	}
+	evse := &mockEvse{connected: true}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, threeCarConfig(), metrics)
+
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN1", "VIN2", "VIN3"})
+
+	// when
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN3", "VIN1", "VIN2"})
+
+	// when
+	vehicleCtrl.chargingStates = map[string]vehicle.ChargingState{
+		"VIN2": {Amps: 8, Power: 5},
+	}
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN2", "VIN3", "VIN1"})
+}
+
 // Mocks
 type mockEvse struct {
 	connected bool
@@ -214,6 +244,29 @@ func (m *mockVehicleController) SetChargingAmps(v *vehicle.Vehicle, amps int) er
 	}
 	m.setAmpsCalls[v.Vin] = amps
 	return m.err
+}
+
+func assertVehicleOrder(t *testing.T, vehicles []vehicle.Vehicle, expectedVins []string) {
+	t.Helper()
+
+	if len(vehicles) != len(expectedVins) {
+		t.Fatalf("Expected %d vehicles, got %d", len(expectedVins), len(vehicles))
+	}
+	for i, vin := range expectedVins {
+		if vehicles[i].Vin != vin {
+			t.Errorf("Expected vehicle at index %d to be %s, got %s", i, vin, vehicles[i].Vin)
+		}
+	}
+}
+
+func threeCarConfig() *configuration.Config {
+	config := baseConfig(0)
+	config.Vehicles.Cars = []configuration.Vehicle{
+		{Name: "Car1", Vin: "VIN1"},
+		{Name: "Car2", Vin: "VIN2"},
+		{Name: "Car3", Vin: "VIN3"},
+	}
+	return config
 }
 
 func baseConfig(safetyMargin int) *configuration.Config {
