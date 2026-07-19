@@ -15,8 +15,9 @@ func Test_NoVehicleInRange(t *testing.T) {
 	// given
 	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
 	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: true}
 	metrics := metrics.NewMetricsRegistry()
-	ctrl := NewController(inverter, vehicleCtrl, baseConfig(0), metrics)
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
 
 	// when
 	ctrl.Tick()
@@ -43,8 +44,9 @@ func Test_NoVehicleCharging(t *testing.T) {
 			"VIN2": {Amps: 0, Power: 0},
 		},
 	}
+	evse := &mockEvse{connected: true}
 	metrics := metrics.NewMetricsRegistry()
-	ctrl := NewController(inverter, vehicleCtrl, baseConfig(0), metrics)
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
 
 	// when
 	ctrl.Tick()
@@ -88,8 +90,9 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 					"VIN2": {Amps: tt.currentAmps, Power: chargingPower},
 				},
 			}
+			evse := &mockEvse{connected: true}
 			metrics := metrics.NewMetricsRegistry()
-			ctrl := NewController(inverter, vehicleCtrl, baseConfig(tt.safetyMargin), metrics)
+			ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(tt.safetyMargin), metrics)
 
 			// when
 			ctrl.Tick()
@@ -117,6 +120,15 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 }
 
 // Mocks
+type mockEvse struct {
+	connected bool
+	err       error
+}
+
+func (m *mockEvse) IsVehicleConnected() (bool, error) {
+	return m.connected, m.err
+}
+
 type mockInverter struct {
 	state pv.InverterState
 	err   error
