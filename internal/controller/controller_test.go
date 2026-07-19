@@ -119,6 +119,62 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 	}
 }
 
+func Test_EVSE_Error(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: false, err: errors.New("evse communication error")}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
+
+	// when
+	ctrl.Tick()
+
+	// then
+	if len(vehicleCtrl.setAmpsCalls) != 0 {
+		t.Errorf("Expected no SetChargingAmps calls, got %v", vehicleCtrl.setAmpsCalls)
+	}
+	if len(metrics.LatestFrame.VehicleFrames) != 0 {
+		t.Errorf("Expected no vehicle frames in metrics, got %v", metrics.LatestFrame.VehicleFrames)
+	}
+
+	// and
+	if metrics.LatestFrame.PowerProductionWatts != 10000 {
+		t.Errorf("Wrong power production in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+	if metrics.LatestFrame.PowerConsumptionWatts != 5000 {
+		t.Errorf("Wrong power consumption in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+}
+
+func Test_EVSE_NoVehicleConnected(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: false}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
+
+	// when
+	ctrl.Tick()
+
+	// then
+	if len(vehicleCtrl.setAmpsCalls) != 0 {
+		t.Errorf("Expected no SetChargingAmps calls, got %v", vehicleCtrl.setAmpsCalls)
+	}
+	if len(metrics.LatestFrame.VehicleFrames) != 0 {
+		t.Errorf("Expected no vehicle frames in metrics, got %v", metrics.LatestFrame.VehicleFrames)
+	}
+
+	// and
+	if metrics.LatestFrame.PowerProductionWatts != 10000 {
+		t.Errorf("Wrong power production in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+	if metrics.LatestFrame.PowerConsumptionWatts != 5000 {
+		t.Errorf("Wrong power consumption in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+}
+
 // Mocks
 type mockEvse struct {
 	connected bool
