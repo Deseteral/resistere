@@ -1,15 +1,15 @@
 # resistere
 
-`resistere` is a solution for dynamic power management that adjusts charge rate of Tesla vehicles based on the PV production surplus.
+`resistere` is a solution for dynamic power management that adjusts the charge rate of Tesla vehicles based on the PV production surplus.
 
 It aims to maximize the use of solar energy, while charging as fast as possible.
 
 ## 🔋 Controller logic
 
-The core of processing logic is contained in `internal/controller.go` module. It runs the `tick` function at set interval.
+The core processing logic is in the `internal/controller/controller.go` module. The controller runs the `Tick` function at a configured interval.
 The entire flow of `tick` function is quite simple and documented - reading it will give you full perspective on how the processing works.
 
-The following diagram presents simplified cycle flow:
+The following diagram presents the charging part of the cycle after the EVSE reports a connected vehicle:
 
 ```
 ┌───────────────┐             ┌───────────────┐        ┌ ─ ─ ─ ─ ─ ─ ─ ┐  ┌───────────────┐
@@ -79,6 +79,7 @@ I've done this project for myself and while it's fairly configurable, it does re
 
 - Sofar HYD 5-20KTL-3PH inverter with Wi-Fi data logger (but it should work with any inverter that outputs the Modbus data in similar way).
 - Linux-based device with Bluetooth Low Energy connectivity (like Raspberry Pi Zero 2 W).
+- Tesla Wall Connector connected to the same network as resistere host.
 - Any Tesla vehicle that can be controlled via Bluetooth.
 
 Adding support for other inverters should be easy, provided you can connect to them and read or calculate energy surplus.
@@ -110,6 +111,9 @@ port = "8899"         # Port of inverter's data logger.
 [tesla_control]
 key_file = "./private_key.pem" # Private key paired with your Teslas.
 
+[tesla_wall_connector]
+ip = "192.168.1.100" # IP address of the Tesla Wall Connector.
+
 [vehicles]
 # List of Tesla vehicles to connect to (name is only needed for easier identification in logs).
 cars = [
@@ -123,6 +127,11 @@ cars = [
 `resistere` is using Bluetooth Low Energy to control charging current in Tesla vehicles. To communicate with the car it uses Tesla's official [`vehicle-command`](https://github.com/teslamotors/vehicle-command) library.
 
 Refer to [library's documentation](https://github.com/teslamotors/vehicle-command/blob/main/README.md) for detailed instructions on pairing.
+
+### Tesla Wall Connector
+
+The application uses the Tesla Wall Connector local API to check whether a vehicle is connected and charging.
+Set `tesla_wall_connector.ip` to the Wall Connector IP address.
 
 ## 👆 Web UI
 
