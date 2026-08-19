@@ -196,6 +196,7 @@ func Test_VehicleOrderPersistsBetweenTicks(t *testing.T) {
 	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN3", "VIN1", "VIN2"})
 
 	// when
+	vehicleCtrl.getChargingStateCalls = nil
 	vehicleCtrl.chargingStates = map[string]vehicle.ChargingState{
 		"VIN2": {Amps: 8, Power: 5},
 	}
@@ -203,6 +204,16 @@ func Test_VehicleOrderPersistsBetweenTicks(t *testing.T) {
 
 	// then
 	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN2", "VIN3", "VIN1"})
+
+	// when
+	vehicleCtrl.getChargingStateCalls = nil
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN2", "VIN3", "VIN1"})
+	if got := vehicleCtrl.getChargingStateCalls; len(got) != 1 || got[0] != "VIN2" {
+		t.Errorf("Expected only VIN2 to be checked after it moved to the front, got %v", got)
+	}
 }
 
 // Mocks
@@ -225,12 +236,14 @@ func (m *mockInverter) ReadInverterState() (pv.InverterState, error) {
 }
 
 type mockVehicleController struct {
-	chargingStates map[string]vehicle.ChargingState
-	setAmpsCalls   map[string]int
-	err            error
+	chargingStates        map[string]vehicle.ChargingState
+	getChargingStateCalls []string
+	setAmpsCalls          map[string]int
+	err                   error
 }
 
 func (m *mockVehicleController) GetChargingState(v *vehicle.Vehicle) (*vehicle.ChargingState, error) {
+	m.getChargingStateCalls = append(m.getChargingStateCalls, v.Vin)
 	state, ok := m.chargingStates[v.Vin]
 	if !ok {
 		return &vehicle.ChargingState{}, errors.New("not in range")

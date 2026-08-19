@@ -118,6 +118,12 @@ func (c *Controller) Tick() {
 		}
 
 		metricsFrame.VehicleFrames = append(metricsFrame.VehicleFrames, vehicleMetricsFrame)
+
+		// If vehicle was selected in this iteration, prevent processing other vehicles.
+		// This is important because not doing so might prevent other not-charging vehicles from sleeping/going offline.
+		if selectedVehicleIndex != -1 {
+			break
+		}
 	}
 
 	// If controller could not communicate with any car (because none is in range, there was a communication error, etc.)
