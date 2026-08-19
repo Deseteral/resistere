@@ -15,8 +15,9 @@ func Test_NoVehicleInRange(t *testing.T) {
 	// given
 	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
 	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: true}
 	metrics := metrics.NewMetricsRegistry()
-	ctrl := NewController(inverter, vehicleCtrl, baseConfig(0), metrics)
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
 
 	// when
 	ctrl.Tick()
@@ -43,8 +44,9 @@ func Test_NoVehicleCharging(t *testing.T) {
 			"VIN2": {Amps: 0, Power: 0},
 		},
 	}
+	evse := &mockEvse{connected: true}
 	metrics := metrics.NewMetricsRegistry()
-	ctrl := NewController(inverter, vehicleCtrl, baseConfig(0), metrics)
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
 
 	// when
 	ctrl.Tick()
@@ -88,8 +90,9 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 					"VIN2": {Amps: tt.currentAmps, Power: chargingPower},
 				},
 			}
+			evse := &mockEvse{connected: true}
 			metrics := metrics.NewMetricsRegistry()
-			ctrl := NewController(inverter, vehicleCtrl, baseConfig(tt.safetyMargin), metrics)
+			ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(tt.safetyMargin), metrics)
 
 			// when
 			ctrl.Tick()
@@ -116,7 +119,113 @@ func Test_AmpsCalculation_SurplusAndCurrentAmps(t *testing.T) {
 	}
 }
 
+func Test_EVSE_Error(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: false, err: errors.New("evse communication error")}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
+
+	// when
+	ctrl.Tick()
+
+	// then
+	if len(vehicleCtrl.setAmpsCalls) != 0 {
+		t.Errorf("Expected no SetChargingAmps calls, got %v", vehicleCtrl.setAmpsCalls)
+	}
+	if len(metrics.LatestFrame.VehicleFrames) != 0 {
+		t.Errorf("Expected no vehicle frames in metrics, got %v", metrics.LatestFrame.VehicleFrames)
+	}
+
+	// and
+	if metrics.LatestFrame.PowerProductionWatts != 10000 {
+		t.Errorf("Wrong power production in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+	if metrics.LatestFrame.PowerConsumptionWatts != 5000 {
+		t.Errorf("Wrong power consumption in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+}
+
+func Test_EVSE_NoVehicleConnected(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{}}
+	evse := &mockEvse{connected: false}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics)
+
+	// when
+	ctrl.Tick()
+
+	// then
+	if len(vehicleCtrl.setAmpsCalls) != 0 {
+		t.Errorf("Expected no SetChargingAmps calls, got %v", vehicleCtrl.setAmpsCalls)
+	}
+	if len(metrics.LatestFrame.VehicleFrames) != 0 {
+		t.Errorf("Expected no vehicle frames in metrics, got %v", metrics.LatestFrame.VehicleFrames)
+	}
+
+	// and
+	if metrics.LatestFrame.PowerProductionWatts != 10000 {
+		t.Errorf("Wrong power production in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+	if metrics.LatestFrame.PowerConsumptionWatts != 5000 {
+		t.Errorf("Wrong power consumption in metrics %v", metrics.LatestFrame.PowerProductionWatts)
+	}
+}
+
+func Test_VehicleOrderPersistsBetweenTicks(t *testing.T) {
+	// given
+	inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+	vehicleCtrl := &mockVehicleController{
+		chargingStates: map[string]vehicle.ChargingState{
+			"VIN3": {Amps: 8, Power: 5},
+		},
+	}
+	evse := &mockEvse{connected: true}
+	metrics := metrics.NewMetricsRegistry()
+	ctrl := NewController(inverter, vehicleCtrl, evse, threeCarConfig(), metrics)
+
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN1", "VIN2", "VIN3"})
+
+	// when
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN3", "VIN1", "VIN2"})
+
+	// when
+	vehicleCtrl.getChargingStateCalls = nil
+	vehicleCtrl.chargingStates = map[string]vehicle.ChargingState{
+		"VIN2": {Amps: 8, Power: 5},
+	}
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN2", "VIN3", "VIN1"})
+
+	// when
+	vehicleCtrl.getChargingStateCalls = nil
+	ctrl.Tick()
+
+	// then
+	assertVehicleOrder(t, ctrl.Vehicles, []string{"VIN2", "VIN3", "VIN1"})
+	if got := vehicleCtrl.getChargingStateCalls; len(got) != 1 || got[0] != "VIN2" {
+		t.Errorf("Expected only VIN2 to be checked after it moved to the front, got %v", got)
+	}
+}
+
 // Mocks
+type mockEvse struct {
+	connected bool
+	err       error
+}
+
+func (m *mockEvse) IsVehicleConnected() (bool, error) {
+	return m.connected, m.err
+}
+
 type mockInverter struct {
 	state pv.InverterState
 	err   error
@@ -127,12 +236,14 @@ func (m *mockInverter) ReadInverterState() (pv.InverterState, error) {
 }
 
 type mockVehicleController struct {
-	chargingStates map[string]vehicle.ChargingState
-	setAmpsCalls   map[string]int
-	err            error
+	chargingStates        map[string]vehicle.ChargingState
+	getChargingStateCalls []string
+	setAmpsCalls          map[string]int
+	err                   error
 }
 
 func (m *mockVehicleController) GetChargingState(v *vehicle.Vehicle) (*vehicle.ChargingState, error) {
+	m.getChargingStateCalls = append(m.getChargingStateCalls, v.Vin)
 	state, ok := m.chargingStates[v.Vin]
 	if !ok {
 		return &vehicle.ChargingState{}, errors.New("not in range")
@@ -146,6 +257,29 @@ func (m *mockVehicleController) SetChargingAmps(v *vehicle.Vehicle, amps int) er
 	}
 	m.setAmpsCalls[v.Vin] = amps
 	return m.err
+}
+
+func assertVehicleOrder(t *testing.T, vehicles []vehicle.Vehicle, expectedVins []string) {
+	t.Helper()
+
+	if len(vehicles) != len(expectedVins) {
+		t.Fatalf("Expected %d vehicles, got %d", len(expectedVins), len(vehicles))
+	}
+	for i, vin := range expectedVins {
+		if vehicles[i].Vin != vin {
+			t.Errorf("Expected vehicle at index %d to be %s, got %s", i, vin, vehicles[i].Vin)
+		}
+	}
+}
+
+func threeCarConfig() *configuration.Config {
+	config := baseConfig(0)
+	config.Vehicles.Cars = []configuration.Vehicle{
+		{Name: "Car1", Vin: "VIN1"},
+		{Name: "Car2", Vin: "VIN2"},
+		{Name: "Car3", Vin: "VIN3"},
+	}
+	return config
 }
 
 func baseConfig(safetyMargin int) *configuration.Config {

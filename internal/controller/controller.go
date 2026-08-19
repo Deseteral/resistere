@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/deseteral/resistere/internal/configuration"
+	"github.com/deseteral/resistere/internal/evse"
 	"github.com/deseteral/resistere/internal/metrics"
 	"github.com/deseteral/resistere/internal/pv"
 	"github.com/deseteral/resistere/internal/utils"
@@ -19,6 +20,7 @@ type Controller struct {
 	updateInterval    time.Duration
 	inverter          pv.Inverter
 	vehicleController vehicle.Controller
+	evse              evse.Evse
 	metricsRegistry   *metrics.Registry
 	config            *configuration.Config
 }
@@ -67,12 +69,25 @@ func (c *Controller) Tick() {
 		return
 	}
 
+	isVehicleConnected, evseErr := c.evse.IsVehicleConnected()
+	if evseErr != nil {
+		log.Printf("Could not communicate with EVSE: %v.\n", evseErr)
+		return
+	}
+	if !isVehicleConnected {
+		log.Println("No vehicle is connected to EVSE. Skipping tick.")
+		return
+	} else {
+		log.Println("Vehicle is connected to EVSE.")
+	}
+
 	// Check for all known vehicles and see which one (if any) is charging.
 	// Save which car is charging and what's its current set amps.
 	var selectedVehicle *vehicle.Vehicle
 	var selectedVehicleChargingAmps int
+	selectedVehicleIndex := -1
 
-	for _, v := range c.Vehicles {
+	for vehicleIdx, v := range c.Vehicles {
 		vehicleMetricsFrame := metrics.NewMetricsVehicleFrame(v.Name)
 
 		chargingState, err := c.vehicleController.GetChargingState(&v)
@@ -95,6 +110,7 @@ func (c *Controller) Tick() {
 		if chargingState.Amps > 0 {
 			selectedVehicle = &v
 			selectedVehicleChargingAmps = chargingState.Amps
+			selectedVehicleIndex = vehicleIdx
 
 			vehicleMetricsFrame.ChargingPowerWatts = float64(chargingState.Power * 1000.0)
 		} else {
@@ -102,6 +118,12 @@ func (c *Controller) Tick() {
 		}
 
 		metricsFrame.VehicleFrames = append(metricsFrame.VehicleFrames, vehicleMetricsFrame)
+
+		// If vehicle was selected in this iteration, prevent processing other vehicles.
+		// This is important because not doing so might prevent other not-charging vehicles from sleeping/going offline.
+		if selectedVehicleIndex != -1 {
+			break
+		}
 	}
 
 	// If controller could not communicate with any car (because none is in range, there was a communication error, etc.)
@@ -111,6 +133,14 @@ func (c *Controller) Tick() {
 		return
 	}
 	log.Printf("Selected vehicle %s with %dA set.\n", selectedVehicle.Name, selectedVehicleChargingAmps)
+
+	// Move the selected vehicle to the front of the list, so that on the next tick it is checked first.
+	// This will prevent waking up car that is probably not charging and does not need waking up.
+	if selectedVehicleIndex > 0 {
+		sv := c.Vehicles[selectedVehicleIndex]
+		copy(c.Vehicles[1:selectedVehicleIndex+1], c.Vehicles[:selectedVehicleIndex])
+		c.Vehicles[0] = sv
+	}
 
 	// If controller could not get energy surplus data from intverter it should stop further processing.
 	if inverterStateErr != nil {
@@ -163,6 +193,7 @@ func (c *Controller) ChangeMode(mode Mode) {
 func NewController(
 	inverter pv.Inverter,
 	vehicleController vehicle.Controller,
+	evse evse.Evse,
 	config *configuration.Config,
 	metricsRegistry *metrics.Registry,
 ) Controller {
@@ -178,6 +209,7 @@ func NewController(
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
 		vehicleController: vehicleController,
+		evse:              evse,
 		metricsRegistry:   metricsRegistry,
 		config:            config,
 	}
