@@ -4,7 +4,7 @@
 
 It aims to maximize the use of solar energy, while charging as fast as possible.
 
-## 🔋 Controller logic
+## Controller logic
 
 The core processing logic is in the `internal/controller/controller.go` module. The controller runs the `Tick` function at a configured interval.
 The entire flow of `tick` function is quite simple and documented - reading it will give you full perspective on how the processing works.
@@ -71,7 +71,7 @@ Where:
 - $V$ - the electric potential of the energy grid.
 - $3$ - represents that the EVSE (Electric Vehicle Supply Equipment) is using three-phases to charge.
 
-## 🚀 Deployment
+## Deployment
 
 ### Hardware
 
@@ -133,13 +133,13 @@ Refer to [library's documentation](https://github.com/teslamotors/vehicle-comman
 The application uses the Tesla Wall Connector local API to check whether a vehicle is connected and charging.
 Set `tesla_wall_connector.ip` to the Wall Connector IP address.
 
-## 👆 Web UI
+## Web UI
 
 The application provides a simple user interface to change the controller mode (automatic/manual).
 
 ![Screenshot of user interface](resources/webui_screenshot.png)
 
-## 🚧 Development
+## Development
 
 This project was built using Go 1.24.1. It uses [templ](https://templ.guide/) for web UI templating.
 
@@ -169,12 +169,12 @@ To run all tests execute:
 go test ./...
 ```
 
-## 📈 Metrics
+## Metrics
 
 There are a couple of simple metrics in Prometheus notation available on `/metrics/prometheus`.
 
 You can find simple, premade, ready to import [Grafana dashboard here](resources/grafana_dashboard.json).
 
-## 📜 License
+## License
 
 This project is licensed under the [MIT license](LICENSE).
