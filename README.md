@@ -6,7 +6,7 @@ It aims to maximize the use of solar energy, while charging as fast as possible.
 
 ## Controller logic
 
-The core processing logic is in the `internal/controller/controller.go` module. The controller runs the `Tick` function at a configured interval.
+The core processing logic is in the `internal/controller/controller.go` module. The controller runs the first tick immediately, then waits for the configured interval after each tick finishes before starting the next one, regardless of how long processing took.
 The entire flow of `tick` function is quite simple and documented - reading it will give you full perspective on how the processing works.
 
 The following diagram presents the charging part of the cycle after the EVSE reports a connected vehicle:
