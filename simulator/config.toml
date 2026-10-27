@@ -1,0 +1,12 @@
+simulator_mode = true
+
+[web]
+port = 5467
+
+[controller]
+cycle_interval_seconds = 10
+safety_margin_watts = 1000
+grid_voltage = 230
+
+[vehicles]
+cars = [{ name = "Simulated Tesla", vin = "SIMULATED" }]

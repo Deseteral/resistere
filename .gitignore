@@ -4,4 +4,6 @@
 bin/
 internal/view/*.go
 config.toml
+!simulator/config.toml
 deploy.sh
+.amp/portals/

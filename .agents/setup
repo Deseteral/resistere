@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+SECONDS=0
+
+echo "Preparing system build tools"
+missing=()
+for package in ca-certificates curl make tar zip; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -qx 'install ok installed'; then
+        missing+=("$package")
+    fi
+done
+if ((${#missing[@]})); then
+    sudo apt-get update
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing[@]}"
+fi
+
+# Match the Go version used in CI.
+echo "Preparing Go 1.24.1 (${SECONDS}s elapsed)"
+go_home="$HOME/.local/share/resistere/go1.24.1"
+if [[ ! -x "$go_home/bin/go" ]] || [[ "$("$go_home/bin/go" version)" != 'go version go1.24.1 '* ]]; then
+    case "$(uname -m)" in
+        x86_64) arch=amd64 ;;
+        aarch64) arch=arm64 ;;
+        *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+    esac
+    download="$(mktemp -d)"
+    trap 'rm -rf "$download"' EXIT
+    curl --fail --silent --show-error --location --retry 3 \
+        "https://go.dev/dl/go1.24.1.linux-${arch}.tar.gz" -o "$download/go.tar.gz"
+    mkdir -p "$go_home"
+    tar -xzf "$download/go.tar.gz" -C "$go_home" --strip-components=1
+    rm -rf "$download"
+    trap - EXIT
+fi
+export PATH="$go_home/bin:$PATH"
+
+echo "Preparing locked Python environment (${SECONDS}s elapsed)"
+python_project="$repo_root/internal/pv/solarman_interface"
+uv sync --locked --project "$python_project"
+export PATH="$python_project/.venv/bin:$PATH"
+
+# Amp and supervised services use separate login shells; keep both toolchains
+# available there, including the Python dependencies needed by the zipapp.
+profile_marker="# resistere orb toolchains"
+if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
+    cat >> "$HOME/.bash_profile" <<EOF
+
+$profile_marker
+case "\$PWD" in
+    "$repo_root"|"$repo_root"/*)
+        export PATH="$python_project/.venv/bin:$go_home/bin:\$PATH"
+        ;;
+esac
+EOF
+fi
+
+echo "Downloading Go modules (${SECONDS}s elapsed)"
+go mod download
+
+echo "Generating assets and warming build cache (${SECONDS}s elapsed)"
+make
+echo "Warming test cache (${SECONDS}s elapsed)"
+go test ./...
+echo "Orb setup finished in ${SECONDS}s"

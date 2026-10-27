@@ -1,0 +1,9 @@
+services:
+  simulator:
+    command: make -C .. && exec ../bin/resistere
+    cwd: simulator
+    port: 5467
+    health: /
+    portal:
+      title: Resistere simulator
+      description: Simulated inverter, vehicle, and EVSE; no hardware or credentials required.
