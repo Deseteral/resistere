@@ -28,14 +28,10 @@ type Controller struct {
 func (c *Controller) StartBackgroundTask() {
 	log.Printf("Starting controller with %v interval.\n", c.updateInterval)
 
-	ticker := time.NewTicker(c.updateInterval)
 	go func() {
-		defer ticker.Stop()
 		for {
-			select {
-			case <-ticker.C:
-				c.Tick()
-			}
+			c.Tick()
+			time.Sleep(c.updateInterval)
 		}
 	}()
 }
