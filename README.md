@@ -141,7 +141,7 @@ The application provides a simple user interface to change the controller mode (
 
 ## Development
 
-This project was built using Go 1.24.1. It uses [templ](https://templ.guide/) for web UI templating.
+This project was built using Go 1.27.3. It uses [templ](https://templ.guide/) for web UI templating.
 
 The frontend is using [HTMX](https://htmx.org/), [Surreal](https://github.com/gnat/surreal), [css-scope-inline](https://github.com/gnat/css-scope-inline) and [Phosphor icons](https://phosphoricons.com/).
 

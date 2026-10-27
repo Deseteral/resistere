@@ -18,9 +18,9 @@ if ((${#missing[@]})); then
 fi
 
 # Match the Go version used in CI.
-echo "Preparing Go 1.24.1 (${SECONDS}s elapsed)"
-go_home="$HOME/.local/share/resistere/go1.24.1"
-if [[ ! -x "$go_home/bin/go" ]] || [[ "$("$go_home/bin/go" version)" != 'go version go1.24.1 '* ]]; then
+echo "Preparing Go 1.27.3 (${SECONDS}s elapsed)"
+go_home="$HOME/.local/share/resistere/go1.27.3"
+if [[ ! -x "$go_home/bin/go" ]] || [[ "$("$go_home/bin/go" version)" != 'go version go1.27.3 '* ]]; then
     case "$(uname -m)" in
         x86_64) arch=amd64 ;;
         aarch64) arch=arm64 ;;
@@ -29,7 +29,7 @@ if [[ ! -x "$go_home/bin/go" ]] || [[ "$("$go_home/bin/go" version)" != 'go vers
     download="$(mktemp -d)"
     trap 'rm -rf "$download"' EXIT
     curl --fail --silent --show-error --location --retry 3 \
-        "https://go.dev/dl/go1.24.1.linux-${arch}.tar.gz" -o "$download/go.tar.gz"
+        "https://go.dev/dl/go1.27.3.linux-${arch}.tar.gz" -o "$download/go.tar.gz"
     mkdir -p "$go_home"
     tar -xzf "$download/go.tar.gz" -C "$go_home" --strip-components=1
     rm -rf "$download"
@@ -45,8 +45,10 @@ export PATH="$python_project/.venv/bin:$PATH"
 # Amp and supervised services use separate login shells; keep both toolchains
 # available there, including the Python dependencies needed by the zipapp.
 profile_marker="# resistere orb toolchains"
-if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
-    cat >> "$HOME/.bash_profile" <<EOF
+if [[ -f "$HOME/.bash_profile" ]]; then
+    sed -i "/^$profile_marker\$/,/^esac\$/d" "$HOME/.bash_profile"
+fi
+cat >> "$HOME/.bash_profile" <<EOF
 
 $profile_marker
 case "\$PWD" in
@@ -55,7 +57,6 @@ case "\$PWD" in
         ;;
 esac
 EOF
-fi
 
 echo "Downloading Go modules (${SECONDS}s elapsed)"
 go mod download
