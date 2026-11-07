@@ -62,13 +62,6 @@ func (c *Controller) Tick() {
 		metricsFrame.PowerConsumptionWatts = inverterState.PowerConsumption
 	}
 
-	// The controller should only perform actions when the device is set to automatic mode.
-	// It must not interfere with charging process when manual mode is set.
-	if c.Mode == ModeManual {
-		log.Println("Exiting controller tick because it's in manual mode.")
-		return
-	}
-
 	isVehicleConnected, evseErr := c.evse.IsVehicleConnected()
 	if evseErr != nil {
 		log.Printf("Could not communicate with EVSE: %v.\n", evseErr)
@@ -140,6 +133,12 @@ func (c *Controller) Tick() {
 		sv := c.Vehicles[selectedVehicleIndex]
 		copy(c.Vehicles[1:selectedVehicleIndex+1], c.Vehicles[:selectedVehicleIndex])
 		c.Vehicles[0] = sv
+	}
+
+	// Collect metrics in every mode, but never adjust charging in manual mode.
+	if c.Mode == ModeManual {
+		log.Println("Exiting controller tick because it's in manual mode.")
+		return
 	}
 
 	// If controller could not get energy surplus data from intverter it should stop further processing.
