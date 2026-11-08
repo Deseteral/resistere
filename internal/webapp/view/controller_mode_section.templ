@@ -8,10 +8,21 @@ import (
 )
 
 templ ControllerModeSection(c *controller.Controller) {
-	<fieldset id="controller-mode-section">
+	{{ mode := c.Mode() }}
+	<fieldset
+		id="controller-mode-section"
+		hx-get="/view/controller-mode"
+		hx-trigger="load delay:5s"
+		hx-swap="outerHTML"
+	>
 		<legend>{ i18n.T(ctx, "mode.tab_title") }</legend>
+		<style>
+		me {
+			min-width: 0;
+		}
+		</style>
 		<div>
-			{ i18n.T(ctx, "mode.current_mode") }: <strong>{ getModeName(ctx, c.Mode) }</strong>
+			{ i18n.T(ctx, "mode.current_mode") }: <strong>{ getModeName(ctx, mode) }</strong>
 		</div>
 		<div
 			hx-target="#controller-mode-section"
@@ -21,25 +32,36 @@ templ ControllerModeSection(c *controller.Controller) {
 			me {
 				display: flex;
 				flex-direction: row;
+				overflow-x: auto;
+				padding-bottom: 2px;
 
 				button {
-					width: 130px;
+					min-width: 130px;
+					flex-shrink: 0;
+					white-space: nowrap;
 				}
 			}
 			</style>
 			<button
 				hx-post={ getUrlForModeButton(controller.ModePVAutomatic) }
-				disabled?={ isModeButtonDisabled(controller.ModePVAutomatic, c.Mode) }
+				disabled?={ isModeButtonDisabled(controller.ModePVAutomatic, mode) }
 			>
 				<i class="ph-bold ph-sun"></i>
 				{ getModeName(ctx, controller.ModePVAutomatic) }
 			</button>
 			<button
 				hx-post={ getUrlForModeButton(controller.ModeManual) }
-				disabled?={ isModeButtonDisabled(controller.ModeManual, c.Mode) }
+				disabled?={ isModeButtonDisabled(controller.ModeManual, mode) }
 			>
 				<i class="ph-bold ph-hand-tap"></i>
 				{ getModeName(ctx, controller.ModeManual) }
+			</button>
+			<button
+				hx-post={ getUrlForModeButton(controller.ModeManualUntilDisconnect) }
+				disabled?={ isModeButtonDisabled(controller.ModeManualUntilDisconnect, mode) }
+			>
+				<i class="ph-bold ph-plug"></i>
+				{ getModeName(ctx, controller.ModeManualUntilDisconnect) }
 			</button>
 		</div>
 		<div>
@@ -60,7 +82,7 @@ templ ControllerModeSection(c *controller.Controller) {
 				}
 				</style>
 			<i class="ph-bold ph-info"></i>
-			{ getHelpMessageForMode(ctx, c.Mode) }
+			{ getHelpMessageForMode(ctx, mode) }
 		</div>
 	</fieldset>
 }
@@ -74,17 +96,23 @@ func isModeButtonDisabled(buttonMode controller.Mode, currentMode controller.Mod
 }
 
 func getModeName(ctx context.Context, mode controller.Mode) string {
-	if mode == controller.ModePVAutomatic {
+	switch mode {
+	case controller.ModePVAutomatic:
 		return i18n.T(ctx, "mode.automatic")
-	} else {
+	case controller.ModeManualUntilDisconnect:
+		return i18n.T(ctx, "mode.manual_until_disconnect")
+	default:
 		return i18n.T(ctx, "mode.manual")
 	}
 }
 
 func getHelpMessageForMode(ctx context.Context, mode controller.Mode) string {
-	if mode == controller.ModePVAutomatic {
+	switch mode {
+	case controller.ModePVAutomatic:
 		return i18n.T(ctx, "mode.help_message_automatic")
-	} else {
+	case controller.ModeManualUntilDisconnect:
+		return i18n.T(ctx, "mode.help_message_manual_until_disconnect")
+	default:
 		return i18n.T(ctx, "mode.help_message_manual")
 	}
 }

@@ -27,21 +27,29 @@ func (w *TeslaWallConnector) IsVehicleConnected() (isVehicleConnected bool, erro
 
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Errorf("Tesla Wall Connector returned HTTP %d", resp.StatusCode)
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error parsing body of Tesla Wall Connector vitals response: %v", err)
 		return false, err
 	}
 
-	var data map[string]interface{}
+	var data struct {
+		VehicleConnected *bool `json:"vehicle_connected"`
+	}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		log.Printf("Error parsing JSON body of Tesla Wall Connector vitals response: %v", err)
 		return false, err
 	}
 
-	connected := data["vehicle_connected"].(bool)
-	return connected, nil
+	if data.VehicleConnected == nil {
+		return false, fmt.Errorf("Tesla Wall Connector vitals missing vehicle_connected")
+	}
+	return *data.VehicleConnected, nil
 }
 
 func NewTeslaWallConnector(config *configuration.TeslaWallConnector) *TeslaWallConnector {
