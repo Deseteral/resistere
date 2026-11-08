@@ -216,6 +216,77 @@ func Test_VehicleOrderPersistsBetweenTicks(t *testing.T) {
 	}
 }
 
+func Test_ManualModes(t *testing.T) {
+	for _, tt := range []struct {
+		name      string
+		mode      Mode
+		connected bool
+		evseErr   error
+		wantMode  Mode
+	}{
+		{"manual connected", ModeManual, true, nil, ModeManual},
+		{"manual disconnected", ModeManual, false, nil, ModeManual},
+		{"until unplugged connected", ModeManualUntilDisconnect, true, nil, ModeManualUntilDisconnect},
+		{"until unplugged disconnected", ModeManualUntilDisconnect, false, nil, ModePVAutomatic},
+		{"until unplugged unknown connection", ModeManualUntilDisconnect, false, errors.New("EVSE unavailable"), ModeManualUntilDisconnect},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			inverter := &mockInverter{state: pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}}
+			vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{"VIN2": {Amps: 8, Power: 5}}}
+			evse := &mockEvse{connected: tt.connected, err: tt.evseErr}
+			registry := metrics.NewMetricsRegistry()
+			ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), registry)
+			ctrl.ChangeMode(tt.mode)
+
+			// when
+			ctrl.Tick()
+
+			// then
+			if ctrl.Mode() != tt.wantMode {
+				t.Errorf("Expected mode %v, got %v", tt.wantMode, ctrl.Mode())
+			}
+			if len(vehicleCtrl.getChargingStateCalls) != 0 || len(vehicleCtrl.setAmpsCalls) != 0 {
+				t.Fatal("Manual modes and disconnected vehicles must not query or control vehicles")
+			}
+			if registry.LatestFrame.PowerProductionWatts != 10000 || registry.LatestFrame.PowerConsumptionWatts != 5000 {
+				t.Fatal("Manual modes must continue updating inverter metrics")
+			}
+		})
+	}
+}
+
+func Test_ManualUntilDisconnectReturnsToAutomatic(t *testing.T) {
+	// given
+	// An inverter error must not prevent returning to automatic on disconnect.
+	inverter := &mockInverter{err: errors.New("inverter unavailable")}
+	vehicleCtrl := &mockVehicleController{chargingStates: map[string]vehicle.ChargingState{"VIN2": {Amps: 8, Power: 5}}}
+	evse := &mockEvse{connected: true}
+	ctrl := NewController(inverter, vehicleCtrl, evse, baseConfig(0), metrics.NewMetricsRegistry())
+	ctrl.ChangeMode(ModeManualUntilDisconnect)
+	ctrl.Tick()
+
+	// when
+	evse.connected = false
+	ctrl.Tick()
+
+	// then
+	if ctrl.Mode() != ModePVAutomatic {
+		t.Fatal("Disconnect must return to automatic mode")
+	}
+
+	// when
+	inverter.err = nil
+	inverter.state = pv.InverterState{PowerProduction: 10000, PowerConsumption: 5000}
+	evse.connected = true
+	ctrl.Tick()
+
+	// then
+	if ctrl.Mode() != ModePVAutomatic || vehicleCtrl.setAmpsCalls["VIN2"] != 15 {
+		t.Fatal("Automatic charging control must resume for the next connected vehicle")
+	}
+}
+
 // Mocks
 type mockEvse struct {
 	connected bool

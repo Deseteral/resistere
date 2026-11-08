@@ -130,12 +130,19 @@ Refer to [library's documentation](https://github.com/teslamotors/vehicle-comman
 
 ### Tesla Wall Connector
 
-The application uses the Tesla Wall Connector local API to check whether a vehicle is connected and charging.
+The application uses the Tesla Wall Connector local API to check whether a vehicle is connected.
 Set `tesla_wall_connector.ip` to the Wall Connector IP address.
 
 ## Web UI
 
-The application provides a simple user interface to change the controller mode (automatic/manual).
+The application provides three controller modes:
+
+- **Automatic** adjusts charging current to use PV surplus.
+- **Manual** leaves charging current under your control until you change modes.
+- **Manual until unplugged** leaves charging current under your control until the Wall Connector reports the vehicle disconnected, then returns to Automatic.
+
+The connection is checked on each controller cycle without querying or waking vehicles in either manual mode.
+A Wall Connector communication error does not count as a disconnect. The web UI refreshes the current mode automatically.
 
 ![Screenshot of user interface](resources/webui_screenshot.png)
 

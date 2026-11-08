@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	"math"
+	"sync"
 	"time"
 
 	"github.com/deseteral/resistere/internal/configuration"
@@ -15,7 +16,9 @@ import (
 
 type Controller struct {
 	Vehicles []vehicle.Vehicle
-	Mode     Mode
+
+	modeMu sync.Mutex
+	mode   Mode
 
 	updateInterval    time.Duration
 	inverter          pv.Inverter
@@ -58,16 +61,14 @@ func (c *Controller) Tick() {
 		metricsFrame.PowerConsumptionWatts = inverterState.PowerConsumption
 	}
 
-	// The controller should only perform actions when the device is set to automatic mode.
-	// It must not interfere with charging process when manual mode is set.
-	if c.Mode == ModeManual {
-		log.Println("Exiting controller tick because it's in manual mode.")
-		return
-	}
-
+	// Monitor the connection without waking or controlling vehicles in either manual mode.
 	isVehicleConnected, evseErr := c.evse.IsVehicleConnected()
 	if evseErr != nil {
 		log.Printf("Could not communicate with EVSE: %v.\n", evseErr)
+		return
+	}
+	if c.updateMode(isVehicleConnected) != ModePVAutomatic {
+		log.Println("Exiting controller tick because it's in manual mode.")
 		return
 	}
 	if !isVehicleConnected {
@@ -182,8 +183,28 @@ func (c *Controller) Tick() {
 }
 
 func (c *Controller) ChangeMode(mode Mode) {
+	c.modeMu.Lock()
+	defer c.modeMu.Unlock()
+
 	log.Printf("Setting controller mode to %v.\n", modeName[mode])
-	c.Mode = mode
+	c.mode = mode
+}
+
+func (c *Controller) Mode() Mode {
+	c.modeMu.Lock()
+	defer c.modeMu.Unlock()
+	return c.mode
+}
+
+func (c *Controller) updateMode(vehicleConnected bool) Mode {
+	c.modeMu.Lock()
+	defer c.modeMu.Unlock()
+
+	if c.mode == ModeManualUntilDisconnect && !vehicleConnected {
+		log.Println("Vehicle disconnected. Returning to automatic mode.")
+		c.mode = ModePVAutomatic
+	}
+	return c.mode
 }
 
 func NewController(
@@ -200,7 +221,7 @@ func NewController(
 
 	return Controller{
 		Vehicles: v,
-		Mode:     ModePVAutomatic,
+		mode:     ModePVAutomatic,
 
 		updateInterval:    time.Duration(config.Controller.CycleIntervalSeconds) * time.Second,
 		inverter:          inverter,
