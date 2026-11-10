@@ -29,7 +29,10 @@ func startApplication() error {
 		evseImpl = evse.NewSimulatedEvse()
 	} else {
 		inverterImpl = pv.NewSolarmanInverter(&config.SolarmanInverter)
-		vehicleControllerImpl = vehicle.NewTeslaControlController(&config.TeslaControl)
+		vehicleControllerImpl, err = vehicle.NewTeslaControlController(&config.TeslaControl)
+		if err != nil {
+			return err
+		}
 		evseImpl = evse.NewTeslaWallConnector(&config.TeslaWallConnector)
 	}
 
