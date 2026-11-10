@@ -87,7 +87,7 @@ Adding support for other inverters should be easy, provided you can connect to t
 ### Software
 
 - Download or build from source `resistere` binary for your architecture.
-- Make sure your Linux environment has [`tesla-control`](https://github.com/teslamotors/vehicle-command/blob/main/cmd/tesla-control/README.md) and Python 3 installed and in path.
+- Make sure your Linux environment has Python 3 installed and in path.
 - Prepare configuration file.
 
 ### Configuration
