@@ -23,39 +23,46 @@ var staticFiles embed.FS
 //go:embed locale
 var locale embed.FS
 
-func StartWebServerBlocking(config *configuration.Config, c *controller.Controller, m *metrics.Registry) error {
+func StartWebServerBlocking(config *configuration.Config, c *controller.Controller, m *metrics.Registry, simulator *Simulator) error {
 	addr := fmt.Sprintf(":%v", config.Web.Port)
 
+	router, err := newRouter(config, c, m, simulator)
+	if err != nil {
+		return err
+	}
+	log.Printf("Web server starting on port %v.\n", config.Web.Port)
+	return http.ListenAndServe(addr, router)
+}
+
+func newRouter(config *configuration.Config, c *controller.Controller, m *metrics.Registry, simulator *Simulator) (http.Handler, error) {
 	var staticFs = fs.FS(staticFiles)
 	htmlContent, err := fs.Sub(staticFs, "static")
 	if err != nil {
 		log.Printf("Error starting web server: %v.\n", err)
-		return err
+		return nil, err
 	}
 
 	err = ctxi18n.Load(locale)
 	if err != nil {
 		log.Printf("Error starting web server: %v.\n", err)
-		return err
+		return nil, err
 	}
 
 	router := http.NewServeMux()
 
-	router.Handle("GET /", i18nMiddleware(templ.Handler(view.Index(c, m))))
+	simulatorEnabled := config.SimulatorMode && simulator != nil
+	router.Handle("GET /{$}", i18nMiddleware(templ.Handler(view.Index(c, m, simulatorEnabled))))
 	router.Handle("GET /view/stats", i18nMiddleware(templ.Handler(view.StatsSection(m))))
 	router.Handle("POST /controller/mode", i18nMiddleware(postChangeControllerMode(c)))
 	router.Handle("GET /metrics/prometheus", getPrometheus(m))
 	router.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(htmlContent))))
 
-	log.Printf("Web server starting on port %v.\n", config.Web.Port)
-
-	err = http.ListenAndServe(addr, router)
-	if err != nil {
-		log.Printf("Error starting web server: %v.\n", err)
-		return err
+	if simulatorEnabled {
+		router.Handle("GET /simulator", simulator.handler(config))
+		router.Handle("POST /simulator", simulator.handler(config))
 	}
 
-	return nil
+	return router, nil
 }
 
 func i18nMiddleware(next http.Handler) http.Handler {

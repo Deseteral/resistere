@@ -21,12 +21,18 @@ func startApplication() error {
 	var inverterImpl pv.Inverter
 	var vehicleControllerImpl vehicle.Controller
 	var evseImpl evse.Evse
+	var simulator *webapp.Simulator
 
 	if config.SimulatorMode {
 		log.Println("Running in simulator mode.")
-		inverterImpl = pv.NewSimulatedInverter()
-		vehicleControllerImpl = vehicle.NewSimulatedVehicleController()
-		evseImpl = evse.NewSimulatedEvse()
+		simulator = &webapp.Simulator{
+			Inverter: pv.NewSimulatedInverter(),
+			Vehicles: vehicle.NewSimulatedVehicleController(),
+			EVSE:     evse.NewSimulatedEvse(),
+		}
+		inverterImpl = simulator.Inverter
+		vehicleControllerImpl = simulator.Vehicles
+		evseImpl = simulator.EVSE
 	} else {
 		inverterImpl = pv.NewSolarmanInverter(&config.SolarmanInverter)
 		vehicleControllerImpl = vehicle.NewTeslaControlController(&config.TeslaControl)
@@ -47,7 +53,7 @@ func startApplication() error {
 
 	c.StartBackgroundTask()
 
-	err = webapp.StartWebServerBlocking(config, &c, mr)
+	err = webapp.StartWebServerBlocking(config, &c, mr, simulator)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,74 @@
+package view
+
+import (
+	"fmt"
+	"github.com/deseteral/resistere/internal/configuration"
+	"github.com/deseteral/resistere/internal/evse"
+	"github.com/deseteral/resistere/internal/pv"
+	"github.com/deseteral/resistere/internal/vehicle"
+	"strconv"
+)
+
+templ SimulatorPage(inverter *pv.SimulatedInverter, charger *evse.SimulatedEvse, vehicles *vehicle.SimulatedVehicleController, cars []configuration.Vehicle, message string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>resistere simulator</title>
+			<script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+			<style>
+				body { font-family: sans-serif; }
+				input, button { font-family: inherit; }
+				main { max-width: 52rem; margin: 0 auto; }
+				form, fieldset { display: grid; gap: 0.75rem; }
+				label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+				.simulator-actions { display: flex; gap: 0.5rem; }
+			</style>
+		</head>
+		<body>
+			<main>
+				<h1>Simulator</h1>
+				<a href="/">Back to application</a>
+				@SimulatorControls(inverter, charger, vehicles, cars, message)
+			</main>
+		</body>
+	</html>
+}
+
+templ SimulatorControls(inverter *pv.SimulatedInverter, charger *evse.SimulatedEvse, vehicles *vehicle.SimulatedVehicleController, cars []configuration.Vehicle, message string) {
+	{{ state, _ := inverter.ReadInverterState() }}
+	{{ connected, _ := charger.IsVehicleConnected() }}
+	<section id="simulator-controls">
+		<p role="status">{ message }</p>
+		<form action="/simulator" method="post" hx-post="/simulator" hx-target="#simulator-controls" hx-swap="outerHTML">
+			<fieldset>
+				<legend>PV inverter</legend>
+				<label>Production (W) <input name="production" type="number" min="0" step="any" required value={ strconv.FormatFloat(state.PowerProduction, 'f', -1, 64) }/></label>
+				<label>Total consumption (W) <input name="consumption" type="number" min="0" step="any" required value={ strconv.FormatFloat(state.PowerConsumption, 'f', -1, 64) }/></label>
+			</fieldset>
+			<fieldset>
+				<legend>EVSE / Wall Connector</legend>
+				<label><input name="connected" type="checkbox" checked?={ connected }/> Vehicle connected</label>
+			</fieldset>
+			for i, car := range cars {
+				{{ s := vehicles.SimulationState(car.Vin) }}
+				{{ prefix := fmt.Sprintf("vehicle_%d_", i) }}
+				<fieldset>
+					<legend>{ car.Name }</legend>
+					<label><input name={ prefix + "reachable" } type="checkbox" checked?={ s.Reachable }/> Reachable by the controller</label>
+					<label>Charging current (A) <input name={ prefix + "amps" } type="number" min="0" max="16" required value={ strconv.Itoa(s.Amps) }/></label>
+					<label>Reported charging power (kW) <input name={ prefix + "power" } type="number" min="0" max="11" required value={ strconv.Itoa(s.Power) }/></label>
+					<em>Use 0 A for a car that is not charging. Reported power is independent of current, as a simulated telemetry reading.</em>
+				</fieldset>
+			}
+			if len(cars) == 0 {
+				<p>No vehicles configured. Add cars to [vehicles] in config.toml to test charging.</p>
+			}
+			<div class="simulator-actions">
+				<button type="submit">Apply</button>
+				<button type="button" hx-get="/simulator" hx-target="#simulator-controls" hx-swap="outerHTML">Refresh</button>
+			</div>
+		</form>
+	</section>
+}
