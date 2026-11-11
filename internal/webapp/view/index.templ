@@ -5,7 +5,7 @@ import (
 	"github.com/deseteral/resistere/internal/metrics"
 )
 
-templ Index(c *controller.Controller, m *metrics.Registry) {
+templ Index(c *controller.Controller, m *metrics.Registry, simulatorEnabled bool) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -27,6 +27,9 @@ templ Index(c *controller.Controller, m *metrics.Registry) {
 		</head>
 		<body hx-boost="true">
 			<h1>resistere</h1>
+			if simulatorEnabled {
+				<p><a href="/simulator" hx-boost="false">Simulator controls</a></p>
+			}
 			<div>
 				<style>
 				me {

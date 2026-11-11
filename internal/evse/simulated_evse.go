@@ -1,11 +1,24 @@
 package evse
 
-type SimulatedEvse struct{}
+import "sync"
+
+type SimulatedEvse struct {
+	mu        sync.RWMutex
+	connected bool
+}
 
 func (e *SimulatedEvse) IsVehicleConnected() (isVehicleConnected bool, error error) {
-	return true, nil
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.connected, nil
+}
+
+func (e *SimulatedEvse) SetConnected(connected bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.connected = connected
 }
 
 func NewSimulatedEvse() *SimulatedEvse {
-	return &SimulatedEvse{}
+	return &SimulatedEvse{connected: true}
 }
